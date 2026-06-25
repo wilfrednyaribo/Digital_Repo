@@ -894,11 +894,7 @@
                    <div class="header-actions">
     
     <!-- ★ MANAGE ALL BUTTON — far left -->
-    <a href="{{ route('documents.manage') }}" class="btn-manage-all">
-    <span class="manage-icon-wrap"><i class="fas fa-table-list"></i></span>
-    <span>Manage All</span>
-    <i class="fas fa-arrow-right manage-arrow"></i>
-</a>
+   
     
     <!-- ★ ADD CATEGORY BUTTON — positioned LEFT of Upload Record -->
     <button onclick="openCategoryModal()" class="btn-upload add-category">
@@ -908,6 +904,121 @@
     <button onclick="openModal('file')" class="btn-upload file"><i class="fas fa-cloud-arrow-up"></i> Upload File</button>
     <button onclick="openModal('book')" class="btn-upload book"><i class="fas fa-book-open"></i> Upload Book</button>
     
+     <style>
+.btn-manage-all {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 11px 22px !important;
+    background: #ffffff !important;
+    color: #1e40af !important;
+    border: 1.5px solid #bfdbfe !important;
+    border-radius: 12px !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    font-family: 'Inter', sans-serif !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    box-shadow: 0 1px 3px rgba(59, 130, 246, 0.08) !important;
+    line-height: 1.4 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+}
+
+.btn-manage-all::before {
+    content: '' !important;
+    position: absolute !important;
+    top: -2px !important;
+    left: -2px !important;
+    right: -2px !important;
+    bottom: -2px !important;
+    background: linear-gradient(135deg, #3b82f6, #2563eb, #60a5fa, #3b82f6) !important;
+    border-radius: 13px !important;
+    z-index: -2 !important;
+    opacity: 0 !important;
+    transition: opacity 0.4s ease !important;
+}
+
+.btn-manage-all::after {
+    content: '' !important;
+    position: absolute !important;
+    inset: 1.5px !important;
+    background: #ffffff !important;
+    border-radius: 11px !important;
+    z-index: -1 !important;
+    transition: background 0.4s ease !important;
+}
+
+.btn-manage-all:hover {
+    color: #1d4ed8 !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2), 0 0 0 1px rgba(59, 130, 246, 0.1) !important;
+}
+
+.btn-manage-all:hover::before {
+    opacity: 1 !important;
+}
+
+.btn-manage-all:hover::after {
+    background: #f8faff !important;
+}
+
+.manage-icon-wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 8px !important;
+    background: #eff6ff !important;
+    font-size: 0.82rem !important;
+    color: #3b82f6 !important;
+    position: relative !important;
+    z-index: 1 !important;
+    transition: all 0.4s ease !important;
+    flex-shrink: 0 !important;
+}
+
+.btn-manage-all:hover .manage-icon-wrap {
+    background: #dbeafe !important;
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.15) !important;
+}
+
+.btn-manage-all > span:nth-child(2) {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.manage-arrow {
+    font-size: 0.6rem !important;
+    color: #3b82f6 !important;
+    opacity: 0 !important;
+    transform: translateX(-8px) !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    z-index: 1 !important;
+    margin-left: 2px !important;
+}
+
+.btn-manage-all:hover .manage-arrow {
+    opacity: 0.7 !important;
+    transform: translateX(0) !important;
+}
+
+.btn-manage-all:active {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15) !important;
+}
+</style>
+
+<a href="{{ route('documents.manage') }}" class="btn-manage-all">
+    <span class="manage-icon-wrap"><i class="fas fa-table-list"></i></span>
+    <span>Manage All</span>
+    <i class="fas fa-arrow-right manage-arrow"></i>
+</a>
 </div>
                 @endauth
             </div>
