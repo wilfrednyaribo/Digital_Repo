@@ -1,0 +1,64 @@
+name: Deploy Laravel to cPanel
+
+on:
+  push:
+    branches:
+      - main # Change this if Wilfred's primary branch is named 'master'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2' # Matching your cPanel PHP version
+
+    - name: Install Composer Dependencies
+      run: composer install --optimize-autoloader --no-dev
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install NPM Dependencies & Compile Assets
+      run: |
+        npm install
+        npm run build
+
+    - name: Sync Core Backend Files
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: 84.16.230.92
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: /digital_repo_core/digital_repo_source/
+        # Exclude the environment file and public entry points so we don't overwrite our custom routing
+        exclude: |
+          **/.git*
+          **/.git*/**
+          .env
+          public/index.php
+          public/.htaccess
+          **/node_modules/**
+          **/tests/**
+          .env.example
+          README.md
+
+    - name: Sync Public Frontend Assets
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: 84.16.230.92
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./public/
+        server-dir: /library.culture.skytechdevelopers.co.ke/
+        # Ensure we don't overwrite the modified index.php and HTTPS redirect
+        exclude: |
+          index.php
+          .htaccess
