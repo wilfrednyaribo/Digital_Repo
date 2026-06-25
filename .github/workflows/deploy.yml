@@ -45,6 +45,10 @@ jobs:
           .env
           public/index.php
           public/.htaccess
+          **/node_modules/**
+          **/tests/**
+          .env.example
+          README.md
 
     - name: Sync Public Frontend Assets
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
