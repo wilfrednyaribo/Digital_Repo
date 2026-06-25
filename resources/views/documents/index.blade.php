@@ -89,6 +89,32 @@
     .btn-upload.book { background: white; color: #7c3aed; border-color: rgba(124, 58, 237, 0.15); box-shadow: 0 2px 8px rgba(124, 58, 237, 0.06); }
     .btn-upload.book i { color: #8b5cf6; }
     .btn-upload.book:hover { background: #f5f3ff; border-color: rgba(124, 58, 237, 0.4); transform: translateY(-2px); }
+
+    /* ═══ ADD CATEGORY BUTTON ═══ */
+    .btn-upload.add-category {
+        background: white;
+        color: #d97706;
+        border-color: rgba(217, 119, 6, 0.15);
+        box-shadow: 0 2px 8px rgba(217, 119, 6, 0.06);
+        position: relative;
+        overflow: hidden;
+    }
+    .btn-upload.add-category i { color: #f59e0b; }
+    .btn-upload.add-category:hover {
+        background: #fffbeb;
+        border-color: rgba(217, 119, 6, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(217, 119, 6, 0.15);
+    }
+    .btn-upload.add-category::after {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%; width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.06), transparent);
+        transition: left 0.5s ease;
+    }
+    .btn-upload.add-category:hover::after { left: 100%; }
+
     .btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: linear-gradient(135deg, #0d9488, #0f766e); color: white; font-size: 0.85rem; font-weight: 600; border-radius: 12px; text-decoration: none; transition: all 0.3s ease; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(13, 148, 136, 0.3); }
     .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4); }
 
@@ -631,6 +657,141 @@
         min-width: 70px;
     }
 
+    /* ═══════════════════════════════════════════
+       CATEGORY MODAL (SMALLER, FOCUSED)
+    ═══════════════════════════════════════════ */
+    .cat-modal-panel {
+        position: fixed;
+        top: 50%; left: 50%; width: 440px; max-width: 95vw;
+        background: white; z-index: 2001; border-radius: 1.25rem;
+        box-shadow: 0 25px 60px -12px rgba(0,0,0,0.35);
+        overflow: hidden;
+        transform: translate(-50%, -50%) scale(0.95);
+        opacity: 0; pointer-events: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .cat-modal-panel.active { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: auto; }
+
+    .cat-modal-header {
+        padding: 1.15rem 1.35rem; border-bottom: 1px solid #f1f5f9; background: #fafafa;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .cat-modal-header h2 {
+        margin: 0; font-size: 1.05rem; font-weight: 700; color: #0f172a;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .cat-modal-header h2 .cat-icon-box {
+        width: 34px; height: 34px; border-radius: 9px;
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        display: flex; align-items: center; justify-content: center;
+        color: #d97706; font-size: 0.85rem;
+        box-shadow: 0 2px 6px rgba(245, 158, 11, 0.25);
+    }
+
+    .cat-modal-body { padding: 1.35rem; }
+
+    .cat-modal-footer {
+        padding: 0.85rem 1.35rem; border-top: 1px solid #f1f5f9; background: white;
+        display: flex; justify-content: flex-end; gap: 0.65rem;
+    }
+
+    .cat-form-input {
+        width: 100%; padding: 0.7rem 1rem; border: 1.5px solid #e5e7eb; border-radius: 10px;
+        font-size: 0.9rem; color: #111827; background: white; transition: all 0.2s;
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.04);
+    }
+    .cat-form-input:focus {
+        outline: none; border-color: #f59e0b;
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.12);
+    }
+    .cat-form-input::placeholder { color: #cbd5e1; }
+
+    .cat-form-hint {
+        display: flex; align-items: center; gap: 6px;
+        margin-top: 0.6rem; font-size: 0.72rem; color: #94a3b8; font-weight: 500;
+    }
+    .cat-form-hint i { font-size: 0.68rem; color: #cbd5e1; }
+
+    .cat-form-error {
+        display: none; align-items: center; gap: 6px;
+        margin-top: 0.6rem; font-size: 0.75rem; color: #dc2626; font-weight: 500;
+        padding: 6px 10px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;
+    }
+    .cat-form-error.visible { display: flex; }
+    .cat-form-error i { font-size: 0.7rem; }
+
+    .cat-form-success {
+        display: none; align-items: center; gap: 8px;
+        margin-top: 0.6rem; font-size: 0.78rem; color: #059669; font-weight: 600;
+        padding: 8px 12px; background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+        border: 1px solid #a7f3d0; border-radius: 8px;
+        animation: slideDown 0.3s ease;
+    }
+    .cat-form-success.visible { display: flex; }
+    .cat-form-success i { font-size: 0.75rem; }
+
+    .btn-cat-cancel {
+        padding: 9px 18px; background: white; color: #64748b; font-size: 0.82rem;
+        font-weight: 600; border-radius: 10px; border: 1px solid #e2e8f0;
+        cursor: pointer; transition: all 0.2s;
+    }
+    .btn-cat-cancel:hover { background: #f8fafc; border-color: #cbd5e1; }
+
+    .btn-cat-submit {
+        padding: 9px 20px; background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white; font-size: 0.82rem; font-weight: 600; border-radius: 10px;
+        border: none; cursor: pointer; transition: all 0.2s; display: inline-flex;
+        align-items: center; gap: 6px;
+        box-shadow: 0 3px 10px rgba(245, 158, 11, 0.3);
+    }
+    .btn-cat-submit:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 5px 16px rgba(245, 158, 11, 0.4);
+    }
+    .btn-cat-submit:disabled {
+        opacity: 0.6; cursor: not-allowed; transform: none;
+        box-shadow: 0 2px 6px rgba(245, 158, 11, 0.15);
+    }
+    .btn-cat-submit .submit-spinner {
+        display: none; width: 14px; height: 14px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top-color: white; border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+    }
+    .btn-cat-submit.loading .submit-spinner { display: inline-block; }
+    .btn-cat-submit.loading .submit-text { display: none; }
+
+    /* Existing categories preview inside modal */
+    .cat-existing-list {
+        margin-top: 1rem; padding-top: 0.85rem; border-top: 1px solid #f1f5f9;
+    }
+    .cat-existing-label {
+        font-size: 0.68rem; font-weight: 700; color: #94a3b8;
+        text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem;
+    }
+    .cat-existing-tags {
+        display: flex; flex-wrap: wrap; gap: 6px; max-height: 90px; overflow-y: auto;
+    }
+    .cat-existing-tags::-webkit-scrollbar { width: 3px; }
+    .cat-existing-tags::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
+    .cat-existing-tag {
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 4px 10px; background: #f8fafc; border: 1px solid #e2e8f0;
+        border-radius: 6px; font-size: 0.7rem; font-weight: 500; color: #64748b;
+        transition: all 0.15s;
+    }
+    .cat-existing-tag.newly-added {
+        background: linear-gradient(135deg, #fffbeb, #fef3c7);
+        border-color: #fde68a;
+        color: #d97706;
+        font-weight: 600;
+        animation: slideDown 0.3s ease;
+    }
+    .cat-existing-tag .tag-dot {
+        width: 5px; height: 5px; border-radius: 50%; background: #cbd5e1;
+    }
+    .cat-existing-tag.newly-added .tag-dot { background: #f59e0b; }
+
     @media (max-width: 1600px) { 
     .doc-grid { grid-template-columns: repeat(5, 1fr); } 
 }
@@ -647,6 +808,7 @@
     .stats-grid { grid-template-columns: 1fr; } 
     .doc-grid { grid-template-columns: repeat(2, 1fr); } 
     .modal-panel { width: 95vw; max-height: 95vh; } 
+    .header-actions { flex-wrap: wrap; }
 }
 @media (max-width: 480px) { 
     .doc-grid { grid-template-columns: 1fr; } 
@@ -676,6 +838,7 @@
                 <a href="{{ route('home') }}" class="nav-link @if(request()->routeIs('home')) active @endif"><i class="fas fa-gauge-high"></i><span>Dashboard</span></a>
                 <div class="nav-section-label">Discover</div>
                 <a href="{{ route('documents.index') }}" class="nav-link @if(request()->routeIs('documents.index') && !request()->has('my_uploads')) active @endif"><i class="fas fa-compass"></i><span>Browse All</span><span class="nav-badge">{{ $documents->total() }}</span></a>
+                <a href="{{ route('documents.manage') }}" class="nav-link"><i class="fas fa-table-list"></i> Manage All</a>
                 <a href="{{ route('documents.index', ['sort' => 'newest']) }}" class="nav-link"><i class="fas fa-clock-rotate-left"></i><span>Recent Additions</span></a>
                 <a href="{{ route('documents.index', ['filter' => 'popular']) }}" class="nav-link"><i class="fas fa-fire"></i><span>Most Popular</span></a>
                 <div class="nav-section-label">Repository</div>
@@ -696,6 +859,15 @@
                         <a href="#" class="nav-link"><i class="fas fa-heart"></i> Favorites</a>
                         <a href="#" class="nav-link"><i class="fas fa-clock-rotate-left"></i> Drafts <span class="nav-badge warning">2</span></a>
                     </div>
+                    <div class="menu-group">
+    <div class="menu-header" onclick="toggleMenu(this)"><span>My Workspace</span><i class="fas fa-chevron-down menu-arrow"></i></div>
+    <div class="submenu">
+        <a href="{{ route('documents.index', ['my_uploads' => auth()->id()]) }}" class="nav-link"><i class="fas fa-user-clock"></i> My Uploads</a>
+        
+        <a href="#" class="nav-link"><i class="fas fa-heart"></i> Favorites</a>
+        <a href="#" class="nav-link"><i class="fas fa-clock-rotate-left"></i> Drafts <span class="nav-badge warning">2</span></a>
+    </div>
+</div>
                 </div>
                 @endauth
             </nav>
@@ -720,6 +892,10 @@
                 </div>
                 @auth
                     <div class="header-actions">
+                        <!-- ★ ADD CATEGORY BUTTON — positioned LEFT of Upload Record -->
+                        <button onclick="openCategoryModal()" class="btn-upload add-category">
+                            <i class="fas fa-tags"></i> Add Category
+                        </button>
                         <button onclick="openModal('record')" class="btn-upload primary"><i class="fas fa-file-circle-plus"></i> Upload Record</button>
                         <button onclick="openModal('file')" class="btn-upload file"><i class="fas fa-cloud-arrow-up"></i> Upload File</button>
                         <button onclick="openModal('book')" class="btn-upload book"><i class="fas fa-book-open"></i> Upload Book</button>
@@ -734,7 +910,7 @@
 
                 <div class="stats-grid">
                     <div class="stat-card blue"><div class="stat-card-top"><div class="stat-icon"><i class="fas fa-folder-open"></i></div><span class="stat-trend neutral"><i class="fas fa-database"></i> All</span></div><div class="stat-label">Total Records</div><div class="stat-value">{{ number_format($documents->total()) }}</div><div class="stat-sub">Complete document inventory</div></div>
-                    <div class="stat-card green"><div class="stat-card-top"><div class="stat-icon"><i class="fas fa-layer-group"></i></div><span class="stat-trend up"><i class="fas fa-check-circle"></i> Active</span></div><div class="stat-label">Categories</div><div class="stat-value">{{ $categories->count() }}</div><div class="stat-sub">Organized classifications</div></div>
+                    <div class="stat-card green"><div class="stat-card-top"><div class="stat-icon"><i class="fas fa-layer-group"></i></div><span class="stat-trend up"><i class="fas fa-check-circle"></i> Active</span></div><div class="stat-label">Categories</div><div class="stat-value" id="statCategoryCount">{{ $categories->count() }}</div><div class="stat-sub">Organized classifications</div></div>
                     <div class="stat-card orange"><div class="stat-card-top"><div class="stat-icon"><i class="fas fa-clock"></i></div><span class="stat-trend up"><i class="fas fa-arrow-up"></i> New</span></div><div class="stat-label">Recent Uploads</div><div class="stat-value">{{ number_format($recentCount) }}</div><div class="stat-sub">Added in last 7 days</div></div>
                     <div class="stat-card purple"><div class="stat-card-top"><div class="stat-icon"><i class="fas fa-bolt"></i></div><span class="stat-trend up"><i class="fas fa-database"></i> Size</span></div><div class="stat-label">Total Size</div><div class="stat-value">{{ number_format($totalSize / 1048576, 1) }}<span style="font-size:0.85rem;font-weight:600;"> MB</span></div><div class="stat-sub">Storage used</div></div>
                 </div>
@@ -859,7 +1035,7 @@
         </main>
     </div>
 
-    <!-- ═══════════ CENTERED POP-UP MODAL ═══════════ -->
+    <!-- ═══════════ CENTERED POP-UP MODAL (Upload) ═══════════ -->
     <div id="modalOverlay" class="modal-overlay" onclick="closeModal()"></div>
     
     <div id="modalPanel" class="modal-panel">
@@ -890,7 +1066,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Category</label>
-                        <select name="category_id" class="form-input">
+                        <select name="category_id" id="modalCategorySelect" class="form-input">
                             <option value="">Select category...</option>
                             @foreach($categories as $cat)
                                 <option value="{{ $cat->id }}">{{ $cat->name }}</option>
@@ -916,430 +1092,585 @@
                         <div id="fileSelected" class="hidden">
                             <i id="fileIcon" class="fas fa-file-circle-check text-3xl text-teal-500 mb-3"></i>
                             <p id="fileName" class="text-sm font-semibold text-gray-900 truncate"></p>
-                            <p id="fileSize" class="text-xs text-gray-500 mt-1"></p>
-                            <button type="button" id="removeFile" class="mt-2 text-xs text-red-500 hover:text-red-700 font-medium">Remove file</button>
+                            <p id="fileSize" class="text-xs text-gray-400 mt-1"></p>
                         </div>
                     </div>
                 </div>
 
-                <div class="cover-section" id="coverSection">
+                <!-- Cover Image Section -->
+                <div class="cover-section">
                     <div class="cover-section-header">
-                        <label class="form-label"><i class="fas fa-image text-purple-500"></i> Cover Image</label>
-                        <span class="cover-hint">Auto-generated from PDF or upload manually</span>
+                        <label class="form-label"><i class="fas fa-image" style="color:#8b5cf6;"></i> Cover Image</label>
+                        <span class="cover-hint">Optional — for books & visual documents</span>
                     </div>
                     <div class="cover-drop-zone" id="coverDropZone">
-                        <input type="file" name="cover_image" id="coverImageInput" accept=".jpg,.jpeg,.png,.webp">
+                        <input type="file" name="cover_image" id="coverImageInput" accept="image/*">
                         <div id="coverPlaceholder" class="cover-placeholder-text">
-                            <i class="fas fa-book"></i>
-                            Upload a cover image<br>
-                            <span style="font-size:0.68rem; color:#b0b8c4;">PDFs auto-generate a cover from the first page</span>
+                            <i class="fas fa-panorama"></i>
+                            Drop cover image or click to browse
                         </div>
                         <div id="coverLoading" class="cover-loading">
                             <div class="spinner"></div>
-                            <span>Generating cover from PDF...</span>
+                            Processing image...
                         </div>
                         <div id="coverPreviewContainer" class="cover-preview-container">
                             <img id="coverPreviewImg" class="cover-preview-img" src="" alt="Cover preview">
-                            <button type="button" class="cover-preview-remove" onclick="removeCoverImage()" title="Remove cover">
+                            <button type="button" id="coverRemoveBtn" class="cover-preview-remove" onclick="removeCoverImage(event)">
                                 <i class="fas fa-xmark"></i>
                             </button>
                             <div>
-                                <div id="coverAutoBadge" class="cover-auto-badge" style="display:none;">
-                                    <i class="fas fa-wand-magic-sparkles"></i> Auto-generated from PDF
-                                </div>
-                                <div id="coverManualBadge" class="cover-manual-badge" style="display:none;">
-                                    <i class="fas fa-upload"></i> Manually uploaded
-                                </div>
+                                <span id="coverBadge" class="cover-auto-badge"><i class="fas fa-wand-magic-sparkles"></i> Auto-compressed</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Rating -->
                 <div class="form-group">
-                    <label class="form-label"><i class="fas fa-star text-amber-400"></i> Rating</label>
+                    <label class="form-label"><i class="fas fa-star" style="color:#fbbf24;"></i> Rating</label>
                     <div class="star-rating-selector" id="starRatingSelector">
-                        <button type="button" class="star-btn" data-rating="1"><i class="fas fa-star"></i></button>
-                        <button type="button" class="star-btn" data-rating="2"><i class="fas fa-star"></i></button>
-                        <button type="button" class="star-btn" data-rating="3"><i class="fas fa-star"></i></button>
-                        <button type="button" class="star-btn" data-rating="4"><i class="fas fa-star"></i></button>
-                        <button type="button" class="star-btn" data-rating="5"><i class="fas fa-star"></i></button>
-                        <span class="star-rating-label" id="ratingLabel">Not rated</span>
+                        <button type="button" class="star-btn" data-value="1"><i class="fas fa-star"></i></button>
+                        <button type="button" class="star-btn" data-value="2"><i class="fas fa-star"></i></button>
+                        <button type="button" class="star-btn" data-value="3"><i class="fas fa-star"></i></button>
+                        <button type="button" class="star-btn" data-value="4"><i class="fas fa-star"></i></button>
+                        <button type="button" class="star-btn" data-value="5"><i class="fas fa-star"></i></button>
+                        <span class="star-rating-label" id="starRatingLabel">Not rated</span>
                     </div>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <button type="button" onclick="closeModal()" class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-                    Cancel
-                </button>
-                <button type="submit" id="submitBtn" class="px-6 py-2.5 text-sm font-semibold text-white bg-teal-600 rounded-lg hover:bg-teal-700 shadow-sm transition flex items-center gap-2">
-                    <i class="fas fa-upload text-xs"></i>
-                    <span id="submitBtnText">Upload Record</span>
+                <button type="button" onclick="closeModal()" class="btn-cat-cancel">Cancel</button>
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-upload"></i> Upload Document
                 </button>
             </div>
         </form>
     </div>
 
-    <!-- Hidden canvas for PDF cover rendering -->
-    <canvas id="pdfCoverCanvas" style="display:none;"></canvas>
-</x-app-layout>
+    <!-- ═══════════ ADD CATEGORY MODAL ═══════════ -->
+    <div id="catModalOverlay" class="modal-overlay" onclick="closeCategoryModal()"></div>
+    
+    <div id="catModalPanel" class="cat-modal-panel">
+        <div class="cat-modal-header">
+            <h2>
+                <span class="cat-icon-box"><i class="fas fa-tags"></i></span>
+                Add New Category
+            </h2>
+            <button type="button" onclick="closeCategoryModal()" class="modal-close"><i class="fas fa-xmark"></i></button>
+        </div>
 
-<!-- PDF.js for auto-generating covers from PDF first page -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script>
-    if (typeof pdfjsLib !== 'undefined') {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    }
+        <div class="cat-modal-body">
+            <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" for="newCategoryName">Category Name <span style="color:#ef4444;">*</span></label>
+                <input 
+                    type="text" 
+                    id="newCategoryName" 
+                    class="cat-form-input" 
+                    placeholder="e.g. Historical Archives, Research Papers..."
+                    autocomplete="off"
+                    maxlength="100"
+                >
+                <div class="cat-form-hint" id="catCharCount">
+                    <i class="fas fa-circle-info"></i>
+                    <span>0 / 100 characters</span>
+                </div>
+                <div class="cat-form-error" id="catFormError">
+                    <i class="fas fa-circle-exclamation"></i>
+                    <span id="catErrorText">This category already exists.</span>
+                </div>
+                <div class="cat-form-success" id="catFormSuccess">
+                    <i class="fas fa-circle-check"></i>
+                    <span id="catSuccessText">Category added successfully!</span>
+                </div>
+            </div>
 
+            <!-- Preview of existing categories -->
+            <div class="cat-existing-list">
+                <div class="cat-existing-label">Existing Categories</div>
+                <div class="cat-existing-tags" id="catExistingTags">
+                    @foreach($categories as $cat)
+                        <span class="cat-existing-tag" data-id="{{ $cat->id }}">
+                            <span class="tag-dot"></span>
+                            {{ $cat->name }}
+                        </span>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        <div class="cat-modal-footer">
+            <button type="button" onclick="closeCategoryModal()" class="btn-cat-cancel">Cancel</button>
+            <button type="button" onclick="submitCategory()" id="catSubmitBtn" class="btn-cat-submit">
+                <span class="submit-text"><i class="fas fa-plus"></i> Add Category</span>
+                <span class="submit-spinner"></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══════════ JAVASCRIPT ═══════════ -->
+    <script>
+    // ═══════════════════════════════════════
+    // SIDEBAR MENU TOGGLE
+    // ═══════════════════════════════════════
     function toggleMenu(header) {
         header.classList.toggle('active');
-        header.nextElementSibling.classList.toggle('open');
+        const submenu = header.nextElementSibling;
+        submenu.classList.toggle('open');
     }
 
-    // ─── TRUE LIVE SEARCH — AJAX, NO PAGE RELOAD ───
-    (function() {
-        const searchInput = document.getElementById('liveSearch');
-        const resetBtn = document.getElementById('btnResetSearch');
-        const categorySelect = document.getElementById('categorySelect');
-        const filterForm = document.getElementById('filterForm');
-        const scrollArea = document.querySelector('.scroll-area');
-        const countBadge = document.querySelector('.filter-bar .count-badge');
-        let debounceTimer = null;
-        let currentRequest = null;
-
-        function performSearch() {
-            const formData = new FormData(filterForm);
-            const params = new URLSearchParams();
-            const search = formData.get('search');
-            const category = formData.get('category');
-            if (search) params.set('search', search);
-            if (category) params.set('category', category);
-            const queryString = params.toString();
-            const url = filterForm.action + (queryString ? '?' + queryString : '');
-
-            if (currentRequest) currentRequest.abort();
-
-            const docGrid = scrollArea.querySelector('.doc-grid');
-            const pagination = scrollArea.querySelector('.pagination');
-
-            if (docGrid) {
-                docGrid.style.opacity = '0.4';
-                docGrid.style.pointerEvents = 'none';
-            }
-
-            currentRequest = fetch(url, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
-
-            currentRequest
-                .then(function(response) {
-                    if (!response.ok) throw new Error('Network error');
-                    return response.text();
-                })
-                .then(function(html) {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const newGrid = doc.querySelector('.doc-grid');
-                    const newBadge = doc.querySelector('.filter-bar .count-badge');
-                    const newPagination = doc.querySelector('.pagination');
-
-                    if (newGrid && docGrid) docGrid.innerHTML = newGrid.innerHTML;
-                    if (newBadge && countBadge) countBadge.textContent = newBadge.textContent;
-
-                    if (pagination) pagination.remove();
-                    if (newPagination && docGrid) {
-                        newPagination.style.display = 'flex';
-                        docGrid.parentNode.insertBefore(newPagination, docGrid.nextSibling);
-                    }
-                    history.replaceState(null, '', url);
-                })
-                .catch(function(err) {
-                    if (err.name !== 'AbortError') console.error('Search failed:', err);
-                })
-                .finally(function() {
-                    if (docGrid) {
-                        docGrid.style.opacity = '';
-                        docGrid.style.pointerEvents = '';
-                    }
-                    currentRequest = null;
-                });
-        }
-
-        searchInput.addEventListener('input', function() {
-            const val = this.value.trim();
-            resetBtn.classList.toggle('visible', val.length > 0);
-            clearTimeout(debounceTimer);
-            if (val.length === 0) { performSearch(); return; }
-            debounceTimer = setTimeout(performSearch, 400);
-        });
-
-        resetBtn.addEventListener('click', function() {
-            searchInput.value = '';
-            resetBtn.classList.remove('visible');
-            searchInput.focus();
-            clearTimeout(debounceTimer);
-            performSearch();
-        });
-
-        categorySelect.addEventListener('change', function() {
-            clearTimeout(debounceTimer);
-            performSearch();
-        });
-    })();
-
-    // ─── MODAL OPEN / CLOSE ───
+    // ═══════════════════════════════════════
+    // UPLOAD MODAL
+    // ═══════════════════════════════════════
     function openModal(type) {
-        const panel = document.getElementById('modalPanel');
-        const overlay = document.getElementById('modalOverlay');
-        const title = document.getElementById('modalTitle');
-        const hiddenInput = document.getElementById('hiddenDocType');
-        const btnText = document.getElementById('submitBtnText');
-        const typeName = type.charAt(0).toUpperCase() + type.slice(1);
-        
-        const iconMap = {
-            record: 'fa-file-circle-plus',
-            file: 'fa-cloud-arrow-up',
-            book: 'fa-book-open'
+        const titles = {
+            record: '<span class="w-8 h-8 bg-teal-50 rounded-lg flex items-center justify-center text-teal-600 text-sm"><i class="fas fa-file-circle-plus"></i></span> Upload Record',
+            file: '<span class="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600 text-sm"><i class="fas fa-cloud-arrow-up"></i></span> Upload File',
+            book: '<span class="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600 text-sm"><i class="fas fa-book-open"></i></span> Upload Book'
         };
-        
-        title.innerHTML = '<span class="w-8 h-8 bg-teal-50 rounded-lg flex items-center justify-center text-teal-600 text-sm"><i class="fas ' + (iconMap[type] || 'fa-cloud-arrow-up') + '"></i></span> Upload ' + typeName;
-        hiddenInput.value = type;
-        btnText.innerText = 'Upload ' + typeName;
-        
-        panel.classList.add('active');
-        overlay.classList.add('active');
+        document.getElementById('modalTitle').innerHTML = titles[type] || titles.record;
+        document.getElementById('hiddenDocType').value = type;
+        document.getElementById('modalOverlay').classList.add('active');
+        document.getElementById('modalPanel').classList.add('active');
         document.body.style.overflow = 'hidden';
     }
 
     function closeModal() {
-        document.getElementById('modalPanel').classList.remove('active');
         document.getElementById('modalOverlay').classList.remove('active');
+        document.getElementById('modalPanel').classList.remove('active');
         document.body.style.overflow = '';
-        setTimeout(function() {
-            document.getElementById('uploadForm').reset();
-            resetFileInput();
-            resetCoverImage();
-            resetStarRating();
-        }, 300);
+        resetUploadForm();
     }
 
-    // ─── FILE INPUT HANDLING ───
-    var dropZone = document.getElementById('dropZone');
-    var fileInput = document.getElementById('fileInput');
-    var uploadPlaceholder = document.getElementById('uploadPlaceholder');
-    var fileSelected = document.getElementById('fileSelected');
-    var fileNameEl = document.getElementById('fileName');
-    var fileSizeEl = document.getElementById('fileSize');
+    function resetUploadForm() {
+        const form = document.getElementById('uploadForm');
+        if (form) form.reset();
+        document.getElementById('hiddenDocType').value = 'record';
+        document.getElementById('coverBase64').value = '';
+        document.getElementById('ratingInput').value = '0';
+        const placeholder = document.getElementById('uploadPlaceholder');
+        const selected = document.getElementById('fileSelected');
+        if (placeholder) placeholder.classList.remove('hidden');
+        if (selected) selected.classList.add('hidden');
+        resetStarRating();
+        removeCoverImage();
+    }
+
+    // ═══════════════════════════════════════
+    // FILE INPUT DISPLAY
+    // ═══════════════════════════════════════
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            const placeholder = document.getElementById('uploadPlaceholder');
+            const selected = document.getElementById('fileSelected');
+            if (this.files && this.files[0]) {
+                placeholder.classList.add('hidden');
+                selected.classList.remove('hidden');
+                document.getElementById('fileName').textContent = this.files[0].name;
+                document.getElementById('fileSize').textContent = formatFileSize(this.files[0].size);
+            } else {
+                placeholder.classList.remove('hidden');
+                selected.classList.add('hidden');
+            }
+        });
+    }
 
     function formatFileSize(bytes) {
         if (bytes === 0) return '0 Bytes';
-        var k = 1024, sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        var i = Math.floor(Math.log(bytes) / Math.log(k));
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
-    function getFileIconClass(name) {
-        var ext = name.split('.').pop().toLowerCase();
-        if (ext === 'pdf') return 'fa-file-pdf text-red-500';
-        if (['doc','docx'].indexOf(ext) !== -1) return 'fa-file-word text-blue-500';
-        if (['jpg','jpeg','png','gif','webp'].indexOf(ext) !== -1) return 'fa-file-image text-green-500';
-        return 'fa-file-lines text-gray-500';
-    }
+    // ═══════════════════════════════════════
+    // STAR RATING
+    // ═══════════════════════════════════════
+    const starLabels = ['Not rated', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+    let currentRating = 0;
 
-    function handleFileSelect(file) {
-        if (!file) return;
-        uploadPlaceholder.classList.add('hidden');
-        fileSelected.classList.remove('hidden');
-        document.getElementById('fileIcon').className = 'fas ' + getFileIconClass(file.name) + ' text-3xl mb-3';
-        fileNameEl.textContent = file.name;
-        fileSizeEl.textContent = formatFileSize(file.size) + ' — ' + file.name.split('.').pop().toUpperCase();
-
-        if (file.name.split('.').pop().toLowerCase() === 'pdf') {
-            generatePdfCover(file);
-        }
-        else if (['jpg','jpeg','png','webp'].indexOf(file.name.split('.').pop().toLowerCase()) !== -1) {
-            generateImageCover(file);
-        }
-    }
-
-    function resetFileInput() {
-        fileInput.value = '';
-        uploadPlaceholder.classList.remove('hidden');
-        fileSelected.classList.add('hidden');
-    }
-
-    fileInput.addEventListener('change', function(e) {
-        if (e.target.files && e.target.files[0]) handleFileSelect(e.target.files[0]);
-    });
-
-    document.getElementById('removeFile').addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        resetFileInput();
-        resetCoverImage();
-    });
-
-    ['dragenter','dragover'].forEach(function(evt) {
-        dropZone.addEventListener(evt, function(e) { e.preventDefault(); dropZone.classList.add('drag-over'); });
-    });
-    ['dragleave','drop'].forEach(function(evt) {
-        dropZone.addEventListener(evt, function(e) { e.preventDefault(); dropZone.classList.remove('drag-over'); });
-    });
-    dropZone.addEventListener('drop', function(e) {
-        var files = e.dataTransfer.files;
-        if (files.length > 0) { fileInput.files = files; handleFileSelect(files[0]); }
-    });
-
-    // ─── PDF COVER GENERATION ───
-    var coverImageInput = document.getElementById('coverImageInput');
-    var coverPlaceholder = document.getElementById('coverPlaceholder');
-    var coverPreviewContainer = document.getElementById('coverPreviewContainer');
-    var coverPreviewImg = document.getElementById('coverPreviewImg');
-    var coverLoading = document.getElementById('coverLoading');
-    var coverAutoBadge = document.getElementById('coverAutoBadge');
-    var coverManualBadge = document.getElementById('coverManualBadge');
-    var coverBase64Input = document.getElementById('coverBase64');
-
-    function generatePdfCover(file) {
-        if (typeof pdfjsLib === 'undefined') return;
-        coverPlaceholder.style.display = 'none';
-        coverLoading.classList.add('active');
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            var typedArray = new Uint8Array(e.target.result);
-            pdfjsLib.getDocument({ data: typedArray }).promise.then(function(pdf) {
-                return pdf.getPage(1);
-            }).then(function(page) {
-                var canvas = document.getElementById('pdfCoverCanvas');
-                var ctx = canvas.getContext('2d');
-                var viewport = page.getViewport({ scale: 1 });
-                var targetWidth = 300;
-                var scale = targetWidth / viewport.width;
-                var scaledViewport = page.getViewport({ scale: scale });
-                canvas.width = scaledViewport.width;
-                canvas.height = scaledViewport.height;
-                return page.render({ canvasContext: ctx, viewport: scaledViewport }).promise;
-            }).then(function() {
-                var canvas = document.getElementById('pdfCoverCanvas');
-                showCoverPreview(canvas.toDataURL('image/jpeg', 0.85), 'auto');
-            }).catch(function(err) {
-                console.error('PDF cover generation failed:', err);
-                coverLoading.classList.remove('active');
-                coverPlaceholder.style.display = '';
-            });
-        };
-        reader.readAsArrayBuffer(file);
-    }
-
-    function generateImageCover(file) {
-        var reader = new FileReader();
-        reader.onload = function(e) { showCoverPreview(e.target.result, 'auto'); };
-        reader.readAsDataURL(file);
-    }
-
-    function showCoverPreview(dataUrl, source) {
-        coverPlaceholder.style.display = 'none';
-        coverLoading.classList.remove('active');
-        coverPreviewContainer.classList.add('active');
-        coverPreviewImg.src = dataUrl;
-        coverBase64Input.value = dataUrl;
-        if (source === 'auto') {
-            coverAutoBadge.style.display = 'inline-flex';
-            coverManualBadge.style.display = 'none';
-        } else {
-            coverAutoBadge.style.display = 'none';
-            coverManualBadge.style.display = 'inline-flex';
-        }
-    }
-
-    function resetCoverImage() {
-        coverPlaceholder.style.display = '';
-        coverLoading.classList.remove('active');
-        coverPreviewContainer.classList.remove('active');
-        coverPreviewImg.src = '';
-        coverAutoBadge.style.display = 'none';
-        coverManualBadge.style.display = 'none';
-        coverBase64Input.value = '';
-        if (coverImageInput) coverImageInput.value = '';
-    }
-
-    function removeCoverImage() { resetCoverImage(); }
-
-    coverImageInput.addEventListener('change', function(e) {
-        if (e.target.files && e.target.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function(ev) { showCoverPreview(ev.target.result, 'manual'); };
-            reader.readAsDataURL(e.target.files[0]);
-        }
-    });
-
-    var coverDropZone = document.getElementById('coverDropZone');
-    ['dragenter','dragover'].forEach(function(evt) {
-        coverDropZone.addEventListener(evt, function(e) { e.preventDefault(); coverDropZone.classList.add('drag-over'); });
-    });
-    ['dragleave','drop'].forEach(function(evt) {
-        coverDropZone.addEventListener(evt, function(e) { e.preventDefault(); coverDropZone.classList.remove('drag-over'); });
-    });
-    coverDropZone.addEventListener('drop', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        var files = e.dataTransfer.files;
-        if (files.length > 0 && files[0].type.startsWith('image/')) {
-            var reader = new FileReader();
-            reader.onload = function(ev) { showCoverPreview(ev.target.result, 'manual'); };
-            reader.readAsDataURL(files[0]);
-        }
-    });
-
-    // ─── STAR RATING SELECTOR ───
-    var starBtns = document.querySelectorAll('#starRatingSelector .star-btn');
-    var ratingLabel = document.getElementById('ratingLabel');
-    var ratingInput = document.getElementById('ratingInput');
-    var currentRating = 0;
-    var ratingLabels = ['Not rated', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
-
-    function updateStarDisplay(rating, isHover) {
-        starBtns.forEach(function(btn, idx) {
-            btn.classList.remove('active', 'hovered');
-            if (isHover) { if (idx < rating) btn.classList.add('hovered'); }
-            else { if (idx < rating) btn.classList.add('active'); }
-        });
-    }
-
-    starBtns.forEach(function(btn) {
+    document.querySelectorAll('#starRatingSelector .star-btn').forEach(btn => {
         btn.addEventListener('mouseenter', function() {
-            var val = parseInt(this.getAttribute('data-rating')) - 1;
-            updateStarDisplay(val, true);
-            ratingLabel.textContent = ratingLabels[val + 1];
-            ratingLabel.style.color = '#f59e0b';
+            const val = parseInt(this.dataset.value);
+            highlightStars(val, 'hovered');
         });
         btn.addEventListener('mouseleave', function() {
-            updateStarDisplay(currentRating, false);
-            ratingLabel.textContent = ratingLabels[currentRating];
-            ratingLabel.style.color = currentRating > 0 ? '#f59e0b' : '#94a3b8';
+            clearStarHover();
+            highlightStars(currentRating, 'active');
         });
         btn.addEventListener('click', function() {
-            var val = parseInt(this.getAttribute('data-rating'));
-            currentRating = val === currentRating ? 0 : val;
-            ratingInput.value = currentRating;
-            updateStarDisplay(currentRating, false);
-            ratingLabel.textContent = ratingLabels[currentRating];
-            ratingLabel.style.color = currentRating > 0 ? '#f59e0b' : '#94a3b8';
+            currentRating = parseInt(this.dataset.value);
+            document.getElementById('ratingInput').value = currentRating;
+            document.getElementById('starRatingLabel').textContent = starLabels[currentRating];
+            highlightStars(currentRating, 'active');
         });
     });
+
+    function highlightStars(upTo, className) {
+        document.querySelectorAll('#starRatingSelector .star-btn').forEach(btn => {
+            const val = parseInt(btn.dataset.value);
+            if (className === 'active') {
+                btn.classList.toggle('active', val <= upTo);
+                btn.classList.remove('hovered');
+            } else {
+                btn.classList.toggle('hovered', val <= upTo);
+            }
+        });
+    }
+
+    function clearStarHover() {
+        document.querySelectorAll('#starRatingSelector .star-btn').forEach(btn => {
+            btn.classList.remove('hovered');
+        });
+    }
 
     function resetStarRating() {
         currentRating = 0;
-        ratingInput.value = 0;
-        updateStarDisplay(0, false);
-        ratingLabel.textContent = ratingLabels[0];
-        ratingLabel.style.color = '#94a3b8';
+        document.querySelectorAll('#starRatingSelector .star-btn').forEach(btn => {
+            btn.classList.remove('active', 'hovered');
+        });
+        const label = document.getElementById('starRatingLabel');
+        if (label) label.textContent = starLabels[0];
     }
 
+    // ═══════════════════════════════════════
+    // COVER IMAGE HANDLING
+    // ═══════════════════════════════════════
+    const coverInput = document.getElementById('coverImageInput');
+    const coverDropZone = document.getElementById('coverDropZone');
+    const coverPlaceholder = document.getElementById('coverPlaceholder');
+    const coverPreviewContainer = document.getElementById('coverPreviewContainer');
+    const coverPreviewImg = document.getElementById('coverPreviewImg');
+    const coverLoading = document.getElementById('coverLoading');
+
+    if (coverInput) {
+        coverInput.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                processCoverImage(e.target.files[0]);
+            }
+        });
+    }
+
+    if (coverDropZone) {
+        coverDropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('drag-over');
+        });
+        coverDropZone.addEventListener('dragleave', function() {
+            this.classList.remove('drag-over');
+        });
+        coverDropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                if (e.dataTransfer.files[0].type.startsWith('image/')) {
+                    processCoverImage(e.dataTransfer.files[0]);
+                }
+            }
+        });
+    }
+
+    function processCoverImage(file) {
+        coverPlaceholder.style.display = 'none';
+        coverPreviewContainer.classList.remove('active');
+        coverLoading.classList.add('active');
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const maxW = 600;
+                const maxH = 900;
+                let w = img.width, h = img.height;
+                if (w > maxW) { h = h * (maxW / w); w = maxW; }
+                if (h > maxH) { w = w * (maxH / h); h = maxH; }
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                const base64 = canvas.toDataURL('image/jpeg', 0.8);
+                document.getElementById('coverBase64').value = base64;
+                coverPreviewImg.src = base64;
+                coverLoading.classList.remove('active');
+                coverPreviewContainer.classList.add('active');
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function removeCoverImage(e) {
+        if (e) e.stopPropagation();
+        document.getElementById('coverBase64').value = '';
+        coverPreviewImg.src = '';
+        coverPreviewContainer.classList.remove('active');
+        coverLoading.classList.remove('active');
+        coverPlaceholder.style.display = '';
+        if (coverInput) coverInput.value = '';
+    }
+
+    // ═══════════════════════════════════════
+    // DROP ZONE FOR MAIN FILE
+    // ═══════════════════════════════════════
+    const dropZone = document.getElementById('dropZone');
+    if (dropZone) {
+        ['dragenter', 'dragover'].forEach(evt => {
+            dropZone.addEventListener(evt, function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+        });
+        ['dragleave', 'drop'].forEach(evt => {
+            dropZone.addEventListener(evt, function(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+            });
+        });
+        dropZone.addEventListener('drop', function(e) {
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                fileInput.files = e.dataTransfer.files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        });
+    }
+
+    // ═══════════════════════════════════════
+    // SEARCH & FILTER
+    // ═══════════════════════════════════════
+    const liveSearch = document.getElementById('liveSearch');
+    const filterForm = document.getElementById('filterForm');
+    const btnResetSearch = document.getElementById('btnResetSearch');
+
+    if (liveSearch) {
+        let searchTimeout;
+        liveSearch.addEventListener('input', function() {
+            const val = this.value.trim();
+            btnResetSearch.classList.toggle('visible', val.length > 0);
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                filterForm.submit();
+            }, 500);
+        });
+    }
+
+    if (btnResetSearch) {
+        btnResetSearch.addEventListener('click', function() {
+            liveSearch.value = '';
+            this.classList.remove('visible');
+            filterForm.submit();
+        });
+    }
+
+    // ═══════════════════════════════════════════════════
+    // ADD CATEGORY MODAL — OPEN / CLOSE
+    // ═══════════════════════════════════════════════════
+    function openCategoryModal() {
+        document.getElementById('catModalOverlay').classList.add('active');
+        document.getElementById('catModalPanel').classList.add('active');
+        document.body.style.overflow = 'hidden';
+        // Reset form state
+        document.getElementById('newCategoryName').value = '';
+        document.getElementById('catCharCount').querySelector('span').textContent = '0 / 100 characters';
+        document.getElementById('catFormError').classList.remove('visible');
+        document.getElementById('catFormSuccess').classList.remove('visible');
+        document.getElementById('catSubmitBtn').classList.remove('loading');
+        document.getElementById('catSubmitBtn').disabled = false;
+        // Remove previously "newly-added" highlights
+        document.querySelectorAll('.cat-existing-tag.newly-added').forEach(tag => {
+            tag.classList.remove('newly-added');
+        });
+        // Focus input after animation
+        setTimeout(() => {
+            document.getElementById('newCategoryName').focus();
+        }, 350);
+    }
+
+    function closeCategoryModal() {
+        document.getElementById('catModalOverlay').classList.remove('active');
+        document.getElementById('catModalPanel').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // ═══════════════════════════════════════════════════
+    // CATEGORY INPUT — CHARACTER COUNT & ENTER KEY
+    // ═══════════════════════════════════════════════════
+    const catNameInput = document.getElementById('newCategoryName');
+    if (catNameInput) {
+        catNameInput.addEventListener('input', function() {
+            const len = this.value.length;
+            document.getElementById('catCharCount').querySelector('span').textContent = len + ' / 100 characters';
+            // Clear error while typing
+            if (len > 0) {
+                document.getElementById('catFormError').classList.remove('visible');
+            }
+        });
+
+        catNameInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                submitCategory();
+            }
+            if (e.key === 'Escape') {
+                closeCategoryModal();
+            }
+        });
+    }
+
+    // ═══════════════════════════════════════════════════
+    // SUBMIT CATEGORY — AJAX
+    // ═══════════════════════════════════════════════════
+    function submitCategory() {
+        const nameInput = document.getElementById('newCategoryName');
+        const name = nameInput.value.trim();
+        const errorEl = document.getElementById('catFormError');
+        const errorText = document.getElementById('catErrorText');
+        const successEl = document.getElementById('catFormSuccess');
+        const submitBtn = document.getElementById('catSubmitBtn');
+
+        // Validate
+        if (!name) {
+            errorText.textContent = 'Please enter a category name.';
+            errorEl.classList.add('visible');
+            successEl.classList.remove('visible');
+            nameInput.focus();
+            return;
+        }
+
+        if (name.length < 2) {
+            errorText.textContent = 'Category name must be at least 2 characters.';
+            errorEl.classList.add('visible');
+            successEl.classList.remove('visible');
+            nameInput.focus();
+            return;
+        }
+
+        // Check duplicate locally first
+        const existingTags = document.querySelectorAll('.cat-existing-tag');
+        for (let tag of existingTags) {
+            if (tag.textContent.trim().toLowerCase() === name.toLowerCase()) {
+                errorText.textContent = 'This category already exists.';
+                errorEl.classList.add('visible');
+                successEl.classList.remove('visible');
+                nameInput.focus();
+                nameInput.select();
+                return;
+            }
+        }
+
+        // Show loading
+        errorEl.classList.remove('visible');
+        successEl.classList.remove('visible');
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+
+        // AJAX request
+        fetch('{{ route("categories.store") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ name: name })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.message || data.errors?.name?.[0] || 'Failed to add category.');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            const newId = data.id || data.category?.id;
+            const newName = data.name || data.category?.name || name;
+
+            // 1. Add to filter bar dropdown
+            addOptionToSelect('categorySelect', newId, newName);
+
+            // 2. Add to upload modal dropdown
+            addOptionToSelect('modalCategorySelect', newId, newName);
+
+            // 3. Add tag to existing categories list in modal
+            const tagsContainer = document.getElementById('catExistingTags');
+            const newTag = document.createElement('span');
+            newTag.className = 'cat-existing-tag newly-added';
+            newTag.dataset.id = newId;
+            newTag.innerHTML = '<span class="tag-dot"></span> ' + escapeHtml(newName);
+            tagsContainer.prepend(newTag);
+            // Scroll to top to show the new tag
+            tagsContainer.scrollTop = 0;
+
+            // 4. Update stat card count
+            const statCount = document.getElementById('statCategoryCount');
+            if (statCount) {
+                statCount.textContent = parseInt(statCount.textContent) + 1;
+            }
+
+            // 5. Show success message
+            document.getElementById('catSuccessText').textContent = '"' + newName + '" added successfully!';
+            successEl.classList.add('visible');
+
+            // 6. Clear input
+            nameInput.value = '';
+            document.getElementById('catCharCount').querySelector('span').textContent = '0 / 100 characters';
+
+            // 7. Re-enable button
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+
+            // 8. Focus input for quick successive adds
+            nameInput.focus();
+        })
+        .catch(error => {
+            errorText.textContent = error.message || 'Something went wrong. Please try again.';
+            errorEl.classList.add('visible');
+            successEl.classList.remove('visible');
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+        });
+    }
+
+    // Helper: add an <option> to a <select> by ID
+    function addOptionToSelect(selectId, value, text) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+
+        // Check if option already exists
+        const existing = select.querySelector('option[value="' + value + '"]');
+        if (existing) return;
+
+        const opt = document.createElement('option');
+        opt.value = value;
+        opt.textContent = text;
+        // Insert before the last position (after all current options, but keep "Select category..." or "All Categories" at top)
+        select.appendChild(opt);
+    }
+
+    // Helper: escape HTML to prevent XSS
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+    }
+
+    // ═══════════════════════════════════════
+    // CLOSE MODALS ON ESCAPE KEY
+    // ═══════════════════════════════════════
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-            var panel = document.getElementById('modalPanel');
-            if (panel.classList.contains('active')) closeModal();
+            // Close category modal first (higher priority if open)
+            if (document.getElementById('catModalPanel').classList.contains('active')) {
+                closeCategoryModal();
+                return;
+            }
+            // Then close upload modal
+            if (document.getElementById('modalPanel').classList.contains('active')) {
+                closeModal();
+            }
         }
     });
-</script>
+    </script>
+</x-app-layout>

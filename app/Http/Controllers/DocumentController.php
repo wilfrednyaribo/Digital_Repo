@@ -201,4 +201,49 @@ class DocumentController extends Controller
 
         return back()->with('success', 'Document deleted successfully.');
     }
+
+    /**
+ * Manage all documents — admin table view.
+ */
+public function manage(Request $request)
+{
+    $query = Document::with('user', 'category');
+
+    // Search
+    if ($request->filled('search')) {
+        $search = $request->input('search');
+        $query->where(function ($q) use ($search) {
+            $q->where('title', 'LIKE', "%{$search}%")
+              ->orWhere('author_creator', 'LIKE', "%{$search}%")
+              ->orWhere('description', 'LIKE', "%{$search}%");
+        });
+    }
+
+    // Filter by type
+    if ($request->filled('type')) {
+        $query->where('document_type', $request->input('type'));
+    }
+
+    // Filter by category
+    if ($request->filled('category')) {
+        $query->where('category_id', $request->input('category'));
+    }
+
+    // Sort
+    $sortField = $request->input('sort', 'created_at');
+    $sortDir = $request->input('dir', 'desc');
+    if (in_array($sortField, ['title', 'document_type', 'file_size', 'created_at', 'author_creator'])) {
+        $query->orderBy($sortField, $sortDir === 'asc' ? 'asc' : 'desc');
+    } else {
+        $query->orderBy('created_at', 'desc');
+    }
+
+    $documents = $query->paginate(15)->withQueryString();
+    $categories = Category::orderBy('name')->get();
+    $typeCounts = Document::select('document_type', \DB::raw('count(*) as total'))
+        ->groupBy('document_type')
+        ->pluck('total', 'document_type');
+
+    return view('documents.manage', compact('documents', 'categories', 'typeCounts'));
+}
 }
