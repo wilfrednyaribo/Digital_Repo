@@ -891,15 +891,24 @@
                     <div class="header-date"><i class="fas fa-calendar-day"></i> {{ now()->format('l, F j, Y') }}</div>
                 </div>
                 @auth
-                    <div class="header-actions">
-                        <!-- ★ ADD CATEGORY BUTTON — positioned LEFT of Upload Record -->
-                        <button onclick="openCategoryModal()" class="btn-upload add-category">
-                            <i class="fas fa-tags"></i> Add Category
-                        </button>
-                        <button onclick="openModal('record')" class="btn-upload primary"><i class="fas fa-file-circle-plus"></i> Upload Record</button>
-                        <button onclick="openModal('file')" class="btn-upload file"><i class="fas fa-cloud-arrow-up"></i> Upload File</button>
-                        <button onclick="openModal('book')" class="btn-upload book"><i class="fas fa-book-open"></i> Upload Book</button>
-                    </div>
+                   <div class="header-actions">
+    
+    <!-- ★ MANAGE ALL BUTTON — far left -->
+    <a href="{{ route('documents.manage') }}" class="btn-manage-all">
+    <span class="manage-icon-wrap"><i class="fas fa-table-list"></i></span>
+    <span>Manage All</span>
+    <i class="fas fa-arrow-right manage-arrow"></i>
+</a>
+    
+    <!-- ★ ADD CATEGORY BUTTON — positioned LEFT of Upload Record -->
+    <button onclick="openCategoryModal()" class="btn-upload add-category">
+        <i class="fas fa-tags"></i> Add Category
+    </button>
+    <button onclick="openModal('record')" class="btn-upload primary"><i class="fas fa-file-circle-plus"></i> Upload Record</button>
+    <button onclick="openModal('file')" class="btn-upload file"><i class="fas fa-cloud-arrow-up"></i> Upload File</button>
+    <button onclick="openModal('book')" class="btn-upload book"><i class="fas fa-book-open"></i> Upload Book</button>
+    
+</div>
                 @endauth
             </div>
 
