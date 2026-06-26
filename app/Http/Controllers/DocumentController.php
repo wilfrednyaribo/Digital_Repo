@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Document;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Http\Requests\UpdateDocumentRequest;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 
@@ -245,5 +246,30 @@ public function manage(Request $request)
         ->pluck('total', 'document_type');
 
     return view('documents.manage', compact('documents', 'categories', 'typeCounts'));
+}
+
+/**
+ * Show the form for editing the specified document.
+ */
+public function edit(Document $document)
+{
+    // Gate the edit if you have a policy:
+    // $this->authorize('update', $document);
+
+    return view('documents.edit', compact('document'));
+}
+
+/**
+ * Update the specified document in storage.
+ */
+public function update(UpdateDocumentRequest $request, Document $document)
+{
+    $validated = $request->validated();
+
+    $document->update($validated);
+
+    return redirect()
+        ->route('documents.manage')   // or whatever your listing route is
+        ->with('success', 'Document updated successfully.');
 }
 }
