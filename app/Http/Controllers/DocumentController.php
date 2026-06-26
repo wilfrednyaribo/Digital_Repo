@@ -272,4 +272,6 @@ public function update(UpdateDocumentRequest $request, Document $document)
         ->route('documents.manage')   // or whatever your listing route is
         ->with('success', 'Document updated successfully.');
 }
+
+
 }

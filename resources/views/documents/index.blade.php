@@ -897,13 +897,17 @@
    
     
     <!-- ★ ADD CATEGORY BUTTON — positioned LEFT of Upload Record -->
+
     <button onclick="openCategoryModal()" class="btn-upload add-category">
-        <i class="fas fa-tags"></i> Add Category
-    </button>
-    <button onclick="openModal('record')" class="btn-upload primary"><i class="fas fa-file-circle-plus"></i> Upload Record</button>
-    <button onclick="openModal('file')" class="btn-upload file"><i class="fas fa-cloud-arrow-up"></i> Upload File</button>
-    <button onclick="openModal('book')" class="btn-upload book"><i class="fas fa-book-open"></i> Upload Book</button>
-    
+    <i class="fas fa-tags"></i> Add Category
+</button>
+    <a href="{{ route('categories.manage') }}" class="btn-upload category-manage">
+    <i class="fas fa-layer-group"></i> Manage Categories
+</a>
+
+{{-- <button onclick="openModal('record')" class="btn-upload primary"><i class="fas fa-file-circle-plus"></i> Upload Record</button> --}}
+<button onclick="openModal('file')" class="btn-upload file"><i class="fas fa-cloud-arrow-up"></i> Upload A Paper</button>
+<button onclick="openModal('book')" class="btn-upload book"><i class="fas fa-book-open"></i> Upload Book</button>
      <style>
 .btn-manage-all {
     display: inline-flex !important;
@@ -1011,6 +1015,23 @@
 .btn-manage-all:active {
     transform: translateY(-1px) !important;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15) !important;
+}
+
+
+
+
+.btn-upload.category-manage {
+    background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+    color: #7c3aed;
+    border: 1.5px solid #ddd6fe;
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.12);
+}
+.btn-upload.category-manage:hover {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    color: white;
+    border-color: #7c3aed;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.3);
 }
 </style>
 
