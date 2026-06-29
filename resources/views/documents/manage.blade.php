@@ -449,13 +449,13 @@
                     </div>
                     <div class="stat-card blue">
                         <div class="stat-icon-wrap"><i class="fas fa-file-shield"></i></div>
-                        <div class="stat-value">{{ $typeCounts->get('record', 0) }}</div>
-                        <div class="stat-label">Records</div>
+                        <div class="stat-value">{{ $typeCounts->get('file', 0) }}</div>
+                        <div class="stat-label">Publications/Reports</div>
                     </div>
                     <div class="stat-card violet">
                         <div class="stat-icon-wrap"><i class="fas fa-book"></i></div>
                         <div class="stat-value">{{ $typeCounts->get('book', 0) + $typeCounts->get('thesis', 0) }}</div>
-                        <div class="stat-label">Books & Theses</div>
+                        <div class="stat-label">Books</div>
                     </div>
                     <div class="stat-card amber">
                         <div class="stat-icon-wrap"><i class="fas fa-hard-drive"></i></div>
@@ -470,22 +470,22 @@
                         <i class="fas fa-layer-group"></i> All
                         <span class="tab-count">{{ $documents->total() }}</span>
                     </a>
-                    <a href="{{ route('documents.manage', ['type' => 'record']) }}" class="type-tab {{ request('type') == 'record' ? 'active' : '' }}">
+                    {{-- <a href="{{ route('documents.manage', ['type' => 'record']) }}" class="type-tab {{ request('type') == 'record' ? 'active' : '' }}">
                         <i class="fas fa-file-shield"></i> Records
                         <span class="tab-count">{{ $typeCounts->get('record', 0) }}</span>
-                    </a>
+                    </a> --}}
                     <a href="{{ route('documents.manage', ['type' => 'file']) }}" class="type-tab {{ request('type') == 'file' ? 'active' : '' }}">
-                        <i class="fas fa-photo-film"></i> Files
+                        <i class="fas fa-photo-film"></i> Publication/Reports
                         <span class="tab-count">{{ $typeCounts->get('file', 0) }}</span>
                     </a>
                     <a href="{{ route('documents.manage', ['type' => 'book']) }}" class="type-tab {{ request('type') == 'book' ? 'active' : '' }}">
                         <i class="fas fa-book"></i> Books
                         <span class="tab-count">{{ $typeCounts->get('book', 0) }}</span>
                     </a>
-                    <a href="{{ route('documents.manage', ['type' => 'thesis']) }}" class="type-tab {{ request('type') == 'thesis' ? 'active' : '' }}">
+                    {{-- <a href="{{ route('documents.manage', ['type' => 'thesis']) }}" class="type-tab {{ request('type') == 'thesis' ? 'active' : '' }}">
                         <i class="fas fa-graduation-cap"></i> Theses
                         <span class="tab-count">{{ $typeCounts->get('thesis', 0) }}</span>
-                    </a>
+                    </a> --}}
                 </div>
 
                 <!-- TOOLBAR -->
