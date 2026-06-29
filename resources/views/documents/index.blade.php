@@ -905,8 +905,8 @@
     <i class="fas fa-layer-group"></i> Manage Categories
 </a>
 
-{{-- <button onclick="openModal('record')" class="btn-upload primary"><i class="fas fa-file-circle-plus"></i> Upload Record</button> --}}
-<button onclick="openModal('file')" class="btn-upload file"><i class="fas fa-cloud-arrow-up"></i> Upload A Paper</button>
+{{-- <button onclick="openModal('record')" class="btn-upload primary"><i class="fas fa-file-circle-plus"></i> Upload R</button> --}}
+<button onclick="openModal('file')" class="btn-upload file"><i class="fas fa-cloud-arrow-up"></i> Upload Publication/Report</button>
 <button onclick="openModal('book')" class="btn-upload book"><i class="fas fa-book-open"></i> Upload Book</button>
      <style>
 .btn-manage-all {
