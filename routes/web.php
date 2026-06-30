@@ -3,6 +3,7 @@
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -11,9 +12,10 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return redirect()->route('login');
-})->name('home');
+Route::get('/', [PublicController::class, 'readerPortal'])->name('reader.portal');
+Route::get('/library', [PublicController::class, 'readerPortal'])->name('reader.portal');
+Route::get('/reports', [PublicController::class, 'reports'])->name('public.reports');
+Route::get('documents/{document}/read', [PublicController::class, 'readInline'])->name('documents.read');
 
 Route::controller(DocumentController::class)->group(function () {
     Route::get('documents', 'index')->name('documents.index');
@@ -70,44 +72,10 @@ Route::middleware('auth')->group(function () {
         Route::put('documents/{document}', 'update')->name('documents.update')->whereNumber('document');
         Route::delete('documents/{document}', 'destroy')->name('documents.destroy')->whereNumber('document');
         Route::delete('documents/bulk-delete', 'bulkDelete')->name('documents.bulk-delete');
+
+        Route::post('/documents/regenerate-cover/{document}', [DocumentController::class, 'regenerateCover'])->name('documents.regenerate.cover');
     });
 
 });
 
 require __DIR__.'/auth.php';
-
-Route::get('/sys-manage/{command}', function (Request $request, $command) {
-    $secretToken = 'SkyTech-Deploy-Key-wBV@1?uM2cL9,NkU'; 
-    
-    if ($request->query('token') !== $secretToken) {
-        abort(403, 'Unauthorized access.');
-    }
-
-    $allowedCommands = [
-        'migrate'  => 'migrate --force',
-        'optimize' => 'optimize:clear',
-        'cache'    => 'cache:clear',
-        'config'   => 'config:clear',
-        'view'     => 'view:clear',
-    ];
-
-    if (!array_key_exists($command, $allowedCommands)) {
-        abort(404, 'Command not allowed.');
-    }
-
-    try {
-        Artisan::call($allowedCommands[$command]);
-        $output = Artisan::output();
-        
-        return response("<div style='background:#1e1e1e; color:#4af626; padding:20px; font-family:monospace; border-radius:5px;'>
-            <h3>Command '{$command}' executed.</h3>
-            <pre>{$output}</pre>
-        </div>");
-        
-    } catch (\Exception $e) {
-        return response("<div style='background:#1e1e1e; color:#ff4444; padding:20px; font-family:monospace; border-radius:5px;'>
-            <h3>Error executing '{$command}'</h3>
-            <pre>{$e->getMessage()}</pre>
-        </div>", 500);
-    }
-});

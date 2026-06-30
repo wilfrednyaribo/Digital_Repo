@@ -378,7 +378,7 @@
         <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <a href="{{ route('home') }}" class="brand">
+                <a href="{{ route('dashboard') }}" class="brand">
                     <div class="brand-icon"><i class="fas fa-landmark"></i></div>
                     <div class="brand-text">DigiRepo</div>
                     <span class="brand-badge">v2.0</span>
@@ -386,7 +386,7 @@
             </div>
             <nav class="sidebar-nav">
                 <div class="nav-section-label">Main</div>
-                <a href="{{ route('home') }}" class="nav-link"><i class="fas fa-gauge-high"></i><span>Dashboard</span></a>
+                <a href="{{ route('dashboard') }}" class="nav-link"><i class="fas fa-gauge-high"></i><span>Dashboard</span></a>
                 <div class="nav-section-label">Discover</div>
                 <a href="{{ route('documents.index') }}" class="nav-link"><i class="fas fa-compass"></i><span>Browse All</span></a>
                 <div class="nav-section-label">Repository</div>
@@ -437,6 +437,9 @@
                     <a href="{{ route('documents.index') }}" class="btn-action secondary"><i class="fas fa-arrow-left"></i> Back to Browse</a>
                     <button onclick="window.location.href='{{ route('documents.index') }}'" class="btn-action primary"><i class="fas fa-plus"></i> Upload New</button>
                 </div>
+                <button id="btnRegenerateCovers" class="btn-upload file" style="margin-left: 10px;">
+    <i class="fas fa-wand-magic-sparkles"></i> Auto-Generate Missing Covers
+</button>
             </div>
 
             <div class="scroll-area">
@@ -457,6 +460,7 @@
                         <div class="stat-value">{{ $typeCounts->get('book', 0) + $typeCounts->get('thesis', 0) }}</div>
                         <div class="stat-label">Books</div>
                     </div>
+                    
                     <div class="stat-card amber">
                         <div class="stat-icon-wrap"><i class="fas fa-hard-drive"></i></div>
                         <div class="stat-value">{{ number_format($documents->sum('file_size') / 1048576, 1) }}<span style="font-size:0.8rem;font-weight:600;color:#94a3b8;margin-left:2px;">MB</span></div>
@@ -791,4 +795,96 @@
         if (e.key === 'Escape') closeDeleteModal();
     });
     </script>
+
+
+<!-- PDF.js (if not already included on this page) -->
+<!-- PDF.js (if not already included on this page) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    document.getElementById('btnRegenerateCovers')?.addEventListener('click', async function() {
+        if(!confirm('This will fetch your PDFs and extract their first pages. Do not close this tab while it runs. Continue?')) return;
+
+        const btn = this;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+        // 1. Find all table rows missing PDF covers.
+        // We look for the placeholder div that has the 'pdf' class (from your $thumbClass variable)
+        const rows = Array.from(document.querySelectorAll('tr[data-id]')).filter(row => {
+            // Checks if the row has a PDF placeholder instead of an actual image
+            return row.querySelector('td .table-thumb-placeholder.pdf');
+        });
+
+        if (rows.length === 0) {
+            alert('No missing PDF covers found on this page!');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Auto-Generate Missing Covers';
+            return;
+        }
+
+        let successCount = 0;
+
+        // 2. Process one by one
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const docId = row.getAttribute('data-id');
+            
+            // Construct the download URL dynamically based on the row's ID
+            // Make sure this matches your actual download route path!
+            const downloadUrl = `/documents/${docId}/download`; 
+
+            // Update button text with progress
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Processing ${i + 1} of ${rows.length}...`;
+
+            try {
+                // Fetch the PDF file from your own server
+                const response = await fetch(downloadUrl);
+                if (!response.ok) throw new Error('Failed to download file');
+                const arrayBuffer = await response.arrayBuffer();
+                const typedArray = new Uint8Array(arrayBuffer);
+
+                // Extract page 1 using PDF.js
+                const pdf = await pdfjsLib.getDocument({ data: typedArray }).promise;
+                const page = await pdf.getPage(1);
+                const viewport = page.getViewport({ scale: 2 }); 
+                
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                await page.render({ canvasContext: context, viewport: viewport }).promise;
+                const base64Image = canvas.toDataURL('image/jpeg', 0.9);
+
+                // 3. Send to Laravel to save in the database
+                const saveResponse = await fetch(`/documents/regenerate-cover/${docId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                    },
+                    body: JSON.stringify({ cover_base64: base64Image })
+                });
+
+                if (saveResponse.ok) {
+                    successCount++;
+                    // Swap the table cell content instantly on screen without reloading
+                    const td = row.querySelector('.table-thumb-placeholder')?.closest('td');
+                    if (td) {
+                        td.innerHTML = `<img src="${base64Image}" class="table-thumb" alt="Cover">`;
+                    }
+                }
+            } catch (error) {
+                console.error(`Failed to process document ${docId}:`, error);
+            }
+        }
+
+        // 4. Done!
+        alert(`Successfully generated ${successCount} out of ${rows.length} covers!`);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Auto-Generate Missing Covers';
+    });
+</script>
 </x-app-layout>

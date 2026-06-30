@@ -291,7 +291,7 @@
         <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <a href="{{ route('home') }}" class="brand">
+                <a href="{{ route('dashboard') }}" class="brand">
                     <div class="brand-icon"><i class="fas fa-landmark"></i></div>
                     <div class="brand-text">DigiRepo</div>
                     <span class="brand-badge">v2.0</span>
@@ -299,7 +299,7 @@
             </div>
             <nav class="sidebar-nav">
                 <div class="nav-section-label">Main</div>
-                <a href="{{ route('home') }}" class="nav-link"><i class="fas fa-gauge-high"></i><span>Dashboard</span></a>
+                <a href="{{ route('dashboard') }}" class="nav-link"><i class="fas fa-gauge-high"></i><span>Dashboard</span></a>
                 <div class="nav-section-label">Discover</div>
                 <a href="{{ route('documents.index') }}" class="nav-link active"><i class="fas fa-compass"></i><span>Browse All</span></a>
                 <a href="{{ route('documents.index', ['sort' => 'newest']) }}" class="nav-link"><i class="fas fa-clock-rotate-left"></i><span>Recent Additions</span></a>
@@ -341,7 +341,7 @@
                 <!-- TOP BAR -->
                 <div class="top-bar">
                     <div class="breadcrumb">
-                        <a href="{{ route('home') }}"><i class="fas fa-house" style="font-size: 0.7rem;"></i> Home</a>
+                        <a href="{{ route('dashboard') }}"><i class="fas fa-house" style="font-size: 0.7rem;"></i> Home</a>
                         <span class="sep"><i class="fas fa-chevron-right"></i></span>
                         <a href="{{ route('documents.index') }}"><i class="fas fa-folder-open" style="font-size: 0.7rem;"></i> Repository</a>
                         <span class="sep"><i class="fas fa-chevron-right"></i></span>
@@ -529,7 +529,7 @@
                         showConfirmButton: false,
                         customClass: { popup: 'border-radius:20px;' },
                         willClose: function() {
-                            window.location.href = '{{ route("home") }}';
+                            window.location.href = '{{ route("dashboard") }}';
                         }
                     });
                 };
