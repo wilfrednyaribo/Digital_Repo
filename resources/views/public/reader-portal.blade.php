@@ -490,7 +490,7 @@
         <p class="r-hero-motto">"Read, Learn, Grow — For a Prosperous Nation"</p>
         <p>Browse our national collection of publications, research papers, and institutional documents — available to read freely in your browser.</p>
         <div class="r-hero-stats">
-            <div class="r-hero-stat"><div class="r-hero-stat-val">{{ $documents->count() }}</div><div class="r-hero-stat-label">Documents</div></div>
+            <div class="r-hero-stat"><div class="r-hero-stat-val">{{ $documents->total() }}</div><div class="r-hero-stat-label">Documents</div></div>
             <div class="r-hero-stat"><div class="r-hero-stat-val">{{ $categories->count() }}</div><div class="r-hero-stat-label">Categories</div></div>
             <div class="r-hero-stat"><div class="hero-stat-val"><span class="accent">Free</span></div><div class="r-hero-stat-label">Access</div></div>
         </div>
