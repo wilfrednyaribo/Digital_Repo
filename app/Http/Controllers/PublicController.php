@@ -13,8 +13,6 @@ class PublicController extends Controller
     |------------------------------------------------------------------
     | READER PORTAL — Main landing page (/)
     |------------------------------------------------------------------
-    | Shows all books in the reading-shelf layout.
-    | No auth required. No download buttons.
     */
     public function readerPortal(Request $request)
     {
@@ -53,10 +51,47 @@ class PublicController extends Controller
 
     /*
     |------------------------------------------------------------------
+    | SEARCH — AJAX live search across ALL documents
+    |------------------------------------------------------------------
+    | Called by the shelf search input via JS debounce.
+    | Searches the entire database, not just the current page.
+    | Returns rendered card HTML + count as JSON.
+    */
+    public function searchPortal(Request $request)
+    {
+        $q = trim($request->input('q', ''));
+
+        // Don't search for empty or too-short queries
+        if (strlen($q) < 2) {
+            return response()->json([
+                'html'  => '',
+                'count' => 0,
+            ]);
+        }
+
+        $documents = Document::with('category')
+            ->where(function ($query) use ($q) {
+                $query->where('title', 'LIKE', "%{$q}%")
+                      ->orWhere('author_creator', 'LIKE', "%{$q}%")
+                      ->orWhere('description', 'LIKE', "%{$q}%");
+            })
+            ->orderByDesc('created_at')
+            ->limit(500)
+            ->get();
+
+        // Render just the card HTML using the shared partial
+        $html = view('public.partials.book-cards', compact('documents'))->render();
+
+        return response()->json([
+            'html'  => $html,
+            'count' => $documents->count(),
+        ]);
+    }
+
+    /*
+    |------------------------------------------------------------------
     | REPORTS — Publications & Reports browsing (/reports)
     |------------------------------------------------------------------
-    | Shows only publication/report type documents.
-    | No auth required.
     */
     public function reports(Request $request)
     {
@@ -95,12 +130,9 @@ class PublicController extends Controller
     |------------------------------------------------------------------
     | READ INLINE — Extract text for in-browser reading
     |------------------------------------------------------------------
-    | Called via AJAX from the reader overlay.
-    | Returns JSON with extracted text content.
     */
     public function readInline(Document $document)
     {
-        // Increment view count
         $document->increment('views');
 
         $content = null;
@@ -118,34 +150,26 @@ class PublicController extends Controller
 
         $ext = strtolower($document->file_type);
 
-        // Plain text files — read directly
         if ($ext === 'txt') {
             $raw = file_get_contents($filePath);
             $content = $this->formatPlainText($raw);
         }
-
-        // PDF files — extract text via Smalot\PdfParser
         elseif ($ext === 'pdf' && class_exists('\Smalot\PdfParser\Parser')) {
             try {
                 $parser = new \Smalot\PdfParser\Parser();
                 $pdf = $parser->parseFile($filePath);
                 $text = $pdf->getText();
-
                 if (trim($text)) {
                     $content = $this->formatPlainText($text);
                 }
             } catch (\Exception $e) {
-                // Silently fail — reader will show fallback message
                 $content = null;
             }
         }
-
-        // DOCX files — extract text via PhpOffice\PhpWord
         elseif (in_array($ext, ['doc', 'docx']) && class_exists('\PhpOffice\PhpWord\IOFactory')) {
             try {
                 $phpWord = \PhpOffice\PhpWord\IOFactory::load($filePath);
                 $paragraphs = [];
-
                 foreach ($phpWord->getSections() as $section) {
                     foreach ($section->getElements() as $element) {
                         if (method_exists($element, 'getText')) {
@@ -156,7 +180,6 @@ class PublicController extends Controller
                         }
                     }
                 }
-
                 if (count($paragraphs) > 0) {
                     $content = $this->formatPlainText(implode("\n\n", $paragraphs));
                 }
@@ -174,25 +197,19 @@ class PublicController extends Controller
 
     /*
     |------------------------------------------------------------------
-    | FORMAT PLAIN TEXT — Convert raw text to HTML paragraphs
+    | FORMAT PLAIN TEXT
     |------------------------------------------------------------------
     */
     private function formatPlainText(string $text): string
     {
-        // Normalize line endings
         $text = str_replace(["\r\n", "\r"], "\n", $text);
-
-        // Split into paragraphs (double newline = paragraph break)
         $blocks = preg_split('/\n\s*\n/', trim($text));
 
         $html = '';
         foreach ($blocks as $block) {
             $block = trim($block);
-            if ($block === '') {
-                continue;
-            }
+            if ($block === '') continue;
 
-            // Detect if block looks like a heading (short, possibly all caps, no period at end)
             $isHeading = (
                 strlen($block) < 80 &&
                 preg_match('/^[A-Z]/', $block) &&
@@ -203,7 +220,6 @@ class PublicController extends Controller
             if ($isHeading) {
                 $html .= '<h2>' . e($block) . "</h2>\n";
             } else {
-                // Convert single newlines within a block to spaces (re-flow text)
                 $flowed = preg_replace('/\n/', ' ', $block);
                 $html .= '<p>' . e($flowed) . "</p>\n";
             }

@@ -21,6 +21,7 @@ Route::controller(DocumentController::class)->group(function () {
     Route::get('documents', 'index')->name('documents.index');
     Route::get('documents/{document}/download', 'download')->name('documents.download');
     Route::get('documents/{document}', 'show')->name('documents.show')->whereNumber('document');
+    Route::get('/search', [PublicController::class, 'searchPortal'])->name('search.portal');
 });
 
 /*

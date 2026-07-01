@@ -477,7 +477,7 @@
         <a href="{{ route('documents.index', ['type' => 'thesis']) }}" class="r-nav-tab">Theses</a> --}}
     </div>
     <div class="r-nav-right">
-        <div class="r-nav-search"><i class="fas fa-search"></i><input type="text" placeholder="Search titles..." id="shelfSearch" oninput="filterShelf()"></div>
+<div class="r-nav-search"><i class="fas fa-search"></i><input type="text" placeholder="Search all titles..." id="shelfSearch" autocomplete="off"></div>
         <a href="{{ route('login') }}" class="r-admin-btn"><i class="fas fa-lock" style="font-size:0.6rem;"></i> Admin</a>
     </div>
 </nav>
@@ -624,13 +624,52 @@
 
     if (typeof pdfjsLib !== 'undefined') pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-    function filterShelf() {
-        const q = document.getElementById('shelfSearch').value.toLowerCase();
-        const books = document.querySelectorAll('.r-book');
-        let visible = 0;
-        books.forEach(b => { const m = b.dataset.title.includes(q); b.style.display = m ? '' : 'none'; if (m) visible++; });
-        document.getElementById('shelfCount').textContent = visible + ' title' + (visible !== 1 ? 's' : '');
+    /* ═══ LIVE SEARCH — searches ALL documents via AJAX ═══ */
+let searchTimer = null;
+let originalGridHtml = '';
+
+// Save original grid on page load so we can restore it
+document.addEventListener('DOMContentLoaded', () => {
+    const grid = document.getElementById('bookGrid');
+    if (grid) originalGridHtml = grid.innerHTML;
+});
+
+document.getElementById('shelfSearch').addEventListener('input', function () {
+    const q = this.value.trim();
+    const grid = document.getElementById('bookGrid');
+    const countEl = document.getElementById('shelfCount');
+
+    // Clear previous timer (debounce: wait 350ms after typing stops)
+    clearTimeout(searchTimer);
+
+    // If search is empty, restore the original paginated view instantly
+    if (q.length < 2) {
+        grid.innerHTML = originalGridHtml;
+        const totalCards = grid.querySelectorAll('.r-book').length;
+        countEl.textContent = totalCards + ' title' + (totalCards !== 1 ? 's' : '');
+        return;
     }
+
+    // Show a brief loading state
+    countEl.textContent = 'Searching...';
+
+    // Debounce the AJAX call
+    searchTimer = setTimeout(() => {
+        fetch('{{ route("search.portal") }}?q=' + encodeURIComponent(q))
+            .then(res => res.json())
+            .then(data => {
+                if (data.html) {
+                    grid.innerHTML = data.html;
+                } else {
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:4rem 1rem;color:var(--gok-gray-400);font-size:0.9rem;"><i class="fas fa-search" style="font-size:1.5rem;display:block;margin-bottom:0.75rem;color:var(--gok-gray-300);"></i>No documents found for "<strong>' + q.replace(/</g, '&lt;') + '</strong>"</div>';
+                }
+                countEl.textContent = data.count + ' result' + (data.count !== 1 ? 's' : '');
+            })
+            .catch(() => {
+                countEl.textContent = 'Search failed';
+            });
+    }, 350);
+});
 
     /* ═══════════════════════════════════════
        READER & ZOOM STATE
