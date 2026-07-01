@@ -44,7 +44,7 @@ class PublicController extends Controller
             ->when(!$request->sort || $request->sort === 'newest', function ($query) {
                 $query->orderByDesc('created_at');
             })
-            ->paginate(100);
+            ->paginate(1000);
 
         $categories = Category::orderBy('name')->get();
 
@@ -84,7 +84,7 @@ class PublicController extends Controller
             ->when(!$request->sort || $request->sort === 'newest', function ($query) {
                 $query->orderByDesc('created_at');
             })
-            ->paginate(100);
+            ->paginate(1000);
 
         $categories = Category::orderBy('name')->get();
 
