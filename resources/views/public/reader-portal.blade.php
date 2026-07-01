@@ -137,19 +137,32 @@
         .r-feature-title { font-size: 0.82rem; font-weight: 700; color: var(--gok-black); margin-bottom: 0.3rem; }
         .r-feature-desc { font-size: 0.72rem; color: var(--gok-gray-500); line-height: 1.5; }
 
-        /* ═══ SHELF ═══ */
+        /* ═══════════════════════════════════════════
+           SHELF — PRODUCTION UNIFORM CARD FIX
+        ═══════════════════════════════════════════ */
         .r-shelf { max-width: 1320px; margin: 0 auto; padding: 3rem 1.5rem; }
         .r-shelf-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.75rem; }
         .r-shelf-title { font-size: 1.2rem; font-weight: 800; color: var(--gok-black); display: flex; align-items: center; gap: 10px; }
         .r-shelf-title .gok-bar { width: 4px; height: 22px; background: linear-gradient(180deg, var(--gok-green), var(--gok-red)); border-radius: 2px; }
         .r-shelf-count { font-size: 0.78rem; color: var(--gok-gray-400); font-weight: 500; margin-left: 4px; }
 
+        /*
+         * THE FIX: grid-auto-rows: 1fr does NOT equalize rows when the
+         * grid container has height:auto — each row still resolves to its
+         * own max-content. The real solution is to make every card's
+         * INTERNAL content take exactly the same vertical space, so the
+         * tallest card in every row is the same height, which naturally
+         * makes all rows equal.
+         *
+         * The key: .r-book-title gets a FIXED height (not min-height)
+         * equal to exactly 2 lines. This eliminates the only variable
+         * that differed between cards.
+         */
         .r-grid {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
             gap: 1.25rem;
             align-items: stretch;
-            grid-auto-rows: 1fr;
         }
 
         .r-book {
@@ -159,7 +172,6 @@
             flex-direction: column;
             cursor: pointer;
             height: 100%;
-            min-height: 0;
         }
         .r-book:hover { transform: translateY(-6px); }
 
@@ -169,14 +181,11 @@
             overflow: hidden;
             position: relative;
             flex-shrink: 0;
-            min-height: 0;
             width: 100%;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.08);
             transition: box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .r-book:hover .r-book-cover { box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 16px 40px rgba(0,0,0,0.14); }
-
-        /* Fallback for browsers where aspect-ratio may not compute correctly */
+        /* Fallback if aspect-ratio fails */
         @supports not (aspect-ratio: 3 / 4.2) {
             .r-book-cover {
                 height: 0;
@@ -190,7 +199,7 @@
                 height: 100% !important;
             }
         }
-
+        .r-book:hover .r-book-cover { box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 16px 40px rgba(0,0,0,0.14); }
         .r-book-cover img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         .r-book:hover .r-book-cover img { transform: scale(1.04); }
         .r-book-spine { position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background: linear-gradient(90deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.08) 40%, transparent 100%); z-index: 2; pointer-events: none; }
@@ -218,6 +227,11 @@
         .r-fake.def-bg .r-fake-icon { background: linear-gradient(135deg, var(--gok-green), var(--gok-green-dark)); color: white; }
         .r-fake-title { font-size: 0.6rem; font-weight: 700; color: var(--gok-black-light); text-align: center; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
+        /*
+         * INFO SECTION — flex column with button pinned to bottom.
+         * Every child above the button has a FIXED or predictable height,
+         * so margin-top:auto on the button always computes the same value.
+         */
         .r-book-info {
             padding: 0.6rem 0.1rem 0;
             flex: 1;
@@ -227,6 +241,18 @@
             overflow: hidden;
         }
 
+        /*
+         * ★ THE CRITICAL FIX ★
+         * height: 2.8em (NOT min-height) forces this element to always
+         * occupy exactly 2 lines of vertical space, regardless of whether
+         * the actual text is 1 line or 2 lines.
+         *
+         * Math: font-size 0.7rem × line-height 1.35 × 2 lines = 2.7em.
+         * We use 2.8em for a tiny safety margin against sub-pixel
+         * rounding differences between local and production browsers.
+         *
+         * flex-shrink: 0 prevents this fixed height from being compressed.
+         */
         .r-book-title {
             font-size: 0.7rem;
             font-weight: 700;
@@ -237,8 +263,8 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
             margin-bottom: 0.2rem;
-            min-height: 2.4em;
-            flex-shrink: 1;
+            height: 2.8em;
+            flex-shrink: 0;
         }
 
         .r-book-author {
@@ -247,6 +273,12 @@
             font-weight: 500;
             margin-bottom: 0.15rem;
             flex-shrink: 0;
+            /* Fixed height for 1 line: font-size × line-height */
+            height: 1.1em;
+            line-height: 1.1em;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
 
         .r-book-meta {
@@ -256,8 +288,17 @@
             align-items: center;
             gap: 4px;
             flex-shrink: 0;
+            /* Fixed height for 1 line */
+            height: 1.2em;
+            line-height: 1.2em;
+            overflow: hidden;
         }
 
+        /*
+         * margin-top: auto pushes this to the bottom of the flex column.
+         * Because everything above has a fixed height, "auto" always
+         * resolves to the SAME pixel value on every card.
+         */
         .r-read-btn {
             margin-top: auto !important;
             width: 100%;
@@ -288,7 +329,7 @@
         .r-read-btn:hover i { transform: translateX(2px); }
         .r-read-btn:active { transform: translateY(0) scale(0.98); box-shadow: 0 1px 4px rgba(0, 107, 63, 0.2); }
 
-        .r-file-badge { display: inline-flex; align-items: center; justify-content: center; padding: 1px 6px; border-radius: 3px; font-size: 0.5rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; line-height: 1.6; }
+        .r-file-badge { display: inline-flex; align-items: center; justify-content: center; padding: 1px 6px; border-radius: 3px; font-size: 0.5rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; line-height: 1.6; flex-shrink: 0; }
         .r-file-badge.pdf { background: rgba(187, 37, 56, 0.08); color: var(--gok-red); }
         .r-file-badge.doc { background: rgba(37, 99, 235, 0.08); color: #2563eb; }
         .r-file-badge.def { background: rgba(0, 107, 63, 0.08); color: var(--gok-green); }
@@ -306,7 +347,6 @@
         .r-overlay.dark-mode { background: var(--gok-black); }
         .r-overlay.sepia-mode { background: #F5F0E3; }
 
-        /* ── Top Bar ── */
         .r-reader-bar {
             height: 52px; background: var(--gok-white); border-bottom: 2px solid var(--gok-green);
             display: flex; align-items: center; justify-content: space-between; padding: 0 1.25rem; flex-shrink: 0;
@@ -330,7 +370,6 @@
         .dark-mode .r-reader-title { color: #bbb; }
         .sepia-mode .r-reader-title { color: #5C4D3A; }
 
-        /* ── Controls Area ── */
         .r-reader-controls { display: flex; align-items: center; gap: 0.35rem; }
         .r-ctrl-sep { width: 1px; height: 22px; background: var(--gok-gray-200); margin: 0 3px; flex-shrink: 0; }
         .dark-mode .r-ctrl-sep { background: #333; }
@@ -360,7 +399,6 @@
         .dark-mode .r-font-select { background: #1a1a1a; border-color: #333; color: #aaa; }
         .sepia-mode .r-font-select { background: #EDE5D3; border-color: #C9BDAA; color: #5C4D3A; }
 
-        /* ── ZOOM WIDGET ── */
         .r-zoom-widget {
             display: flex; align-items: center; gap: 0; background: var(--gok-gray-50);
             border-radius: 8px; border: 1px solid var(--gok-gray-200); overflow: hidden;
@@ -420,7 +458,6 @@
         .sepia-mode .r-zoom-option:hover { background: rgba(107, 93, 62, 0.08); color: #3C3226; }
         .sepia-mode .r-zoom-option.active { background: rgba(107, 93, 62, 0.12); color: #3C3226; }
 
-        /* ── Reader Body ── */
         .r-reader-body { flex: 1; overflow: hidden; position: relative; }
         .r-reader-page {
             position: absolute; inset: 0; overflow-y: auto; padding: 2.5rem 0;
@@ -435,7 +472,6 @@
 
         .r-page-inner { max-width: 700px; margin: 0 auto; padding: 0 2rem; transition: max-width 0.3s; }
 
-        /* ── Text Styles ── */
         .r-chapter-title {
             font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700;
             line-height: 1.25; margin-bottom: 0.5rem; letter-spacing: -0.01em;
@@ -470,7 +506,6 @@
         .dark-mode .r-reader-text h2 { color: #6ee7b7; }
         .sepia-mode .r-reader-text h2 { color: #6B5D3E; }
 
-        /* ── Bottom Footer ── */
         .r-reader-footer {
             height: 40px; background: var(--gok-white); border-top: 2px solid var(--gok-green);
             display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; flex-shrink: 0;
@@ -491,7 +526,6 @@
 
         .r-watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 4rem; font-weight: 900; color: rgba(0, 0, 0, 0.012); pointer-events: none; z-index: 210; white-space: nowrap; letter-spacing: 0.15em; text-transform: uppercase; }
 
-        /* PDF canvases */
         .pdf-page-canvas {
             display: block; width: 100%; max-width: 680px;
             margin: 0 auto 1.5rem; border-radius: 4px;
@@ -504,7 +538,6 @@
         .pdf-render-bar { width: 180px; height: 3px; background: var(--gok-gray-100); border-radius: 2px; overflow: hidden; }
         .pdf-render-bar-fill { height: 100%; background: var(--gok-green); border-radius: 2px; transition: width 0.3s; width: 0%; }
 
-        /* State messages */
         .r-reader-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; gap: 1rem; text-align: center; padding: 2rem; }
         .r-reader-state-icon { width: 72px; height: 72px; border-radius: 20px; background: var(--gok-gray-50); display: flex; align-items: center; justify-content: center; }
         .r-reader-state-icon i { font-size: 1.8rem; color: var(--gok-gray-300); }
@@ -531,14 +564,14 @@
         .r-footer-tricolor .t-red { background: var(--gok-red); }
         .r-footer-tricolor .t-green { background: var(--gok-green); }
 
-        @media (max-width: 1200px) { .r-grid { grid-template-columns: repeat(4, 1fr); gap: 1.1rem; align-items: stretch; grid-auto-rows: 1fr; } }
-        @media (max-width: 900px) { .r-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; align-items: stretch; grid-auto-rows: 1fr; } }
+        @media (max-width: 1200px) { .r-grid { grid-template-columns: repeat(4, 1fr); gap: 1.1rem; align-items: stretch; } }
+        @media (max-width: 900px) { .r-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; align-items: stretch; } }
         @media (max-width: 768px) {
             .r-nav-center { display: none; } .r-nav-search { display: none; }
             .r-hero { padding: 3.5rem 1.5rem 2.5rem; } .r-hero h1 { font-size: 2rem; }
             .r-hero-stats { gap: 1.5rem; } .r-hero-stat-val { font-size: 1.3rem; }
             .r-features-grid { grid-template-columns: 1fr; }
-            .r-grid { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; align-items: stretch; grid-auto-rows: 1fr; }
+            .r-grid { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; align-items: stretch; }
             .r-shelf { padding: 2rem 1rem; }
             .r-reader-title { max-width: 140px; font-size: 0.7rem; }
             .r-font-select { display: none; }
@@ -714,9 +747,6 @@
         document.getElementById('shelfCount').textContent = visible + ' title' + (visible !== 1 ? 's' : '');
     }
 
-    /* ═══════════════════════════════════════
-       READER & ZOOM STATE
-    ═══════════════════════════════════════ */
     let currentFontSize = 18;
     let currentTheme = 'light';
     let currentReaderMode = 'text';
@@ -728,23 +758,15 @@
     function escapeHtml(s) { if (!s) return ''; const d = document.createElement('div'); d.appendChild(document.createTextNode(s)); return d.innerHTML; }
 
     function showLoading(msg) {
-        document.getElementById('readerContent').innerHTML = `<div class="r-reader-state"><div style="width:40px;height:40px;border:3px solid var(--gok-gray-200);border-top-color:var(--gok-green);border-radius:50%;animation:spin 0.8s linear infinite;"></div><p style="color:var(--gok-gray-400);font-size:0.85rem;margin:0;">${msg || 'Loading...'}</p></div>`;
+        document.getElementById('readerContent').innerHTML = '<div class="r-reader-state"><div style="width:40px;height:40px;border:3px solid var(--gok-gray-200);border-top-color:var(--gok-green);border-radius:50%;animation:spin 0.8s linear infinite;"></div><p style="color:var(--gok-gray-400);font-size:0.85rem;margin:0;">' + (msg || 'Loading...') + '</p></div>';
     }
 
     function showError(title, msg) {
-        document.getElementById('readerContent').innerHTML = `<div class="r-reader-state"><div class="r-reader-state-icon"><i class="fas fa-exclamation-triangle" style="color:var(--gok-red);"></i></div><h2>${title}</h2><p>${msg}</p><button class="r-reader-state-btn" onclick="closeReader()"><i class="fas fa-arrow-left" style="font-size:0.75rem;"></i> Go Back</button></div>`;
+        document.getElementById('readerContent').innerHTML = '<div class="r-reader-state"><div class="r-reader-state-icon"><i class="fas fa-exclamation-triangle" style="color:var(--gok-red);"></i></div><h2>' + title + '</h2><p>' + msg + '</p><button class="r-reader-state-btn" onclick="closeReader()"><i class="fas fa-arrow-left" style="font-size:0.75rem;"></i> Go Back</button></div>';
     }
 
-    /* ═══════════════════════════════════════
-       ZOOM CONTROLS
-    ═══════════════════════════════════════ */
-    function zoomIn() {
-        setZoom(Math.min(300, zoomLevel + ZOOM_STEP));
-    }
-
-    function zoomOut() {
-        setZoom(Math.max(50, zoomLevel - ZOOM_STEP));
-    }
+    function zoomIn() { setZoom(Math.min(300, zoomLevel + ZOOM_STEP)); }
+    function zoomOut() { setZoom(Math.max(50, zoomLevel - ZOOM_STEP)); }
 
     function setZoom(level) {
         zoomLevel = level;
@@ -757,14 +779,11 @@
         const footer = document.getElementById('zoomFooterLabel');
         const inBtn = document.getElementById('zoomOutBtn');
         const outBtn = document.getElementById('zoomInBtn');
-
         const display = zoomLevel % 100 === 0 ? zoomLevel + '%' : zoomLevel.toFixed(0) + '%';
         val.childNodes[0].textContent = display + '\n        ';
         footer.textContent = display;
-
         outBtn.classList.toggle('disabled', zoomLevel <= 50);
         inBtn.classList.toggle('disabled', zoomLevel >= 300);
-
         document.querySelectorAll('.r-zoom-option').forEach(opt => {
             opt.classList.toggle('active', parseInt(opt.dataset.zoom) === zoomLevel);
         });
@@ -772,16 +791,13 @@
 
     function applyZoom() {
         const scale = zoomLevel / 100;
-
         if (currentReaderMode === 'pdf') {
             document.querySelectorAll('.pdf-page-canvas').forEach(canvas => {
-                canvas.style.transform = `scale(${scale})`;
+                canvas.style.transform = 'scale(' + scale + ')';
                 canvas.style.marginBottom = Math.max(8, 24 * scale) + 'px';
             });
             const inner = document.querySelector('.r-page-inner');
-            if (inner) {
-                inner.style.maxWidth = (700 * scale) + 'px';
-            }
+            if (inner) inner.style.maxWidth = (700 * scale) + 'px';
         } else {
             const baseSize = 18;
             const newSize = Math.max(10, Math.min(48, Math.round(baseSize * scale)));
@@ -792,14 +808,13 @@
     }
 
     function toggleZoomDropdown() {
-        const dd = document.getElementById('zoomDropdown');
-        dd.classList.toggle('open');
+        document.getElementById('zoomDropdown').classList.toggle('open');
     }
 
     function buildZoomDropdown() {
         const dd = document.getElementById('zoomDropdown');
         dd.innerHTML = ZOOM_LEVELS.map(z =>
-            `<button class="r-zoom-option${z === zoomLevel ? ' active' : ''}" data-zoom="${z}" onclick="setZoom(${z}); toggleZoomDropdown();">${z}%</button>`
+            '<button class="r-zoom-option' + (z === zoomLevel ? ' active' : '') + '" data-zoom="' + z + '" onclick="setZoom(' + z + '); toggleZoomDropdown();">' + z + '%</button>'
         ).join('');
     }
 
