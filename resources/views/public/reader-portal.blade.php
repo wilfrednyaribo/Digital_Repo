@@ -93,7 +93,7 @@
         }
         .r-hero::after {
             content: ''; position: absolute; inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.015' fill-rule='evenodd'%3E%3Cpath d='M20 0L40 20L20 40L0 20z'/%3E%3C/g%3E/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.015' fill-rule='evenodd'%3E%3Cpath d='M20 0L40 20L20 40L0 20z'/%3E%3C/g%3E%3C/svg%3E");
         }
         .r-hero-inner { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; text-align: center; }
         .r-hero-crest {
@@ -143,16 +143,54 @@
         .r-shelf-title { font-size: 1.2rem; font-weight: 800; color: var(--gok-black); display: flex; align-items: center; gap: 10px; }
         .r-shelf-title .gok-bar { width: 4px; height: 22px; background: linear-gradient(180deg, var(--gok-green), var(--gok-red)); border-radius: 2px; }
         .r-shelf-count { font-size: 0.78rem; color: var(--gok-gray-400); font-weight: 500; margin-left: 4px; }
-        .r-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1.25rem; }
-        .r-book { position: relative; transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; cursor: pointer; }
+
+        .r-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1.25rem;
+            align-items: stretch;
+            grid-auto-rows: 1fr;
+        }
+
+        .r-book {
+            position: relative;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            height: 100%;
+            min-height: 0;
+        }
         .r-book:hover { transform: translateY(-6px); }
+
         .r-book-cover {
-            aspect-ratio: 3 / 4.2; border-radius: 6px 10px 10px 6px; overflow: hidden;
-            position: relative; flex-shrink: 0;
+            aspect-ratio: 3 / 4.2;
+            border-radius: 6px 10px 10px 6px;
+            overflow: hidden;
+            position: relative;
+            flex-shrink: 0;
+            min-height: 0;
+            width: 100%;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.08);
             transition: box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .r-book:hover .r-book-cover { box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 16px 40px rgba(0,0,0,0.14); }
+
+        /* Fallback for browsers where aspect-ratio may not compute correctly */
+        @supports not (aspect-ratio: 3 / 4.2) {
+            .r-book-cover {
+                height: 0;
+                padding-bottom: 140%;
+                position: relative;
+            }
+            .r-book-cover > * {
+                position: absolute !important;
+                inset: 0;
+                width: 100% !important;
+                height: 100% !important;
+            }
+        }
+
         .r-book-cover img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         .r-book:hover .r-book-cover img { transform: scale(1.04); }
         .r-book-spine { position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background: linear-gradient(90deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.08) 40%, transparent 100%); z-index: 2; pointer-events: none; }
@@ -180,19 +218,68 @@
         .r-fake.def-bg .r-fake-icon { background: linear-gradient(135deg, var(--gok-green), var(--gok-green-dark)); color: white; }
         .r-fake-title { font-size: 0.6rem; font-weight: 700; color: var(--gok-black-light); text-align: center; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
-        .r-book-info { padding: 0.6rem 0.1rem 0; flex: 1; display: flex; flex-direction: column; min-height: 0; }
-        .r-book-title { font-size: 0.7rem; font-weight: 700; color: var(--gok-black); line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0.2rem; }
-        .r-book-author { font-size: 0.62rem; color: var(--gok-gray-400); font-weight: 500; margin-bottom: 0.15rem; }
-        .r-book-meta { font-size: 0.55rem; color: var(--gok-gray-300); display: flex; align-items: center; gap: 4px; }
+        .r-book-info {
+            padding: 0.6rem 0.1rem 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .r-book-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--gok-black);
+            line-height: 1.35;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 0.2rem;
+            min-height: 2.4em;
+            flex-shrink: 1;
+        }
+
+        .r-book-author {
+            font-size: 0.62rem;
+            color: var(--gok-gray-400);
+            font-weight: 500;
+            margin-bottom: 0.15rem;
+            flex-shrink: 0;
+        }
+
+        .r-book-meta {
+            font-size: 0.55rem;
+            color: var(--gok-gray-300);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
 
         .r-read-btn {
-            margin-top: 0.55rem; width: 100%; padding: 7px 0; border: none; border-radius: 7px;
+            margin-top: auto !important;
+            width: 100%;
+            padding: 7px 0;
+            border: none;
+            border-radius: 7px;
             background: linear-gradient(135deg, var(--gok-green) 0%, var(--gok-green-dark) 100%);
-            color: white; font-size: 0.62rem; font-weight: 700; font-family: 'Inter', sans-serif;
-            letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer;
+            color: white;
+            font-size: 0.62rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex; align-items: center; justify-content: center; gap: 5px;
-            position: relative; overflow: hidden; flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
             box-shadow: 0 2px 8px rgba(0, 107, 63, 0.2);
         }
         .r-read-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 60%); pointer-events: none; }
@@ -444,14 +531,14 @@
         .r-footer-tricolor .t-red { background: var(--gok-red); }
         .r-footer-tricolor .t-green { background: var(--gok-green); }
 
-        @media (max-width: 1200px) { .r-grid { grid-template-columns: repeat(4, 1fr); gap: 1.1rem; } }
-        @media (max-width: 900px) { .r-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; } }
+        @media (max-width: 1200px) { .r-grid { grid-template-columns: repeat(4, 1fr); gap: 1.1rem; align-items: stretch; grid-auto-rows: 1fr; } }
+        @media (max-width: 900px) { .r-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; align-items: stretch; grid-auto-rows: 1fr; } }
         @media (max-width: 768px) {
             .r-nav-center { display: none; } .r-nav-search { display: none; }
             .r-hero { padding: 3.5rem 1.5rem 2.5rem; } .r-hero h1 { font-size: 2rem; }
             .r-hero-stats { gap: 1.5rem; } .r-hero-stat-val { font-size: 1.3rem; }
             .r-features-grid { grid-template-columns: 1fr; }
-            .r-grid { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
+            .r-grid { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; align-items: stretch; grid-auto-rows: 1fr; }
             .r-shelf { padding: 2rem 1rem; }
             .r-reader-title { max-width: 140px; font-size: 0.7rem; }
             .r-font-select { display: none; }
@@ -473,8 +560,6 @@
     </a>
     <div class="r-nav-center">
         <a href="{{ route('reader.portal') }}" class="r-nav-tab active"><i class="fas fa-book-open" style="margin-right:4px;font-size:0.7rem;"></i> Browse All</a>
-        {{-- <a href="{{ route('documents.index', ['type' => 'book']) }}" class="r-nav-tab">Books</a>
-        <a href="{{ route('documents.index', ['type' => 'thesis']) }}" class="r-nav-tab">Theses</a> --}}
     </div>
     <div class="r-nav-right">
         <div class="r-nav-search"><i class="fas fa-search"></i><input type="text" placeholder="Search titles..." id="shelfSearch" oninput="filterShelf()"></div>
@@ -563,7 +648,6 @@
             <span class="r-reader-title" id="readerTitle">Book Title</span>
         </div>
         <div class="r-reader-controls">
-            <!-- ZOOM: minus | percentage | plus -->
             <div class="r-zoom-widget" id="zoomWidget">
                 <button class="r-zoom-btn" id="zoomOutBtn" onclick="zoomOut()" title="Zoom out"><i class="fas fa-minus"></i></button>
                 <div class="r-zoom-value" id="zoomValue" onclick="toggleZoomDropdown()" title="Click to select zoom level">
@@ -575,7 +659,6 @@
 
             <div class="r-ctrl-sep"></div>
 
-            <!-- FONT family (text mode only) -->
             <select class="r-font-select" id="fontSelect" onchange="changeFont(this.value)">
                 <option value="'Merriweather', serif">Merriweather</option>
                 <option value="'Lora', serif">Lora</option>
@@ -585,7 +668,6 @@
 
             <div class="r-ctrl-sep"></div>
 
-            <!-- Theme buttons -->
             <button class="r-ctrl-btn active" id="btnLight" onclick="setTheme('light')" title="Light"><i class="fas fa-sun"></i></button>
             <button class="r-ctrl-btn" id="btnDark" onclick="setTheme('dark')" title="Dark"><i class="fas fa-moon"></i></button>
             <button class="r-ctrl-btn" id="btnSepia" onclick="setTheme('sepia')" title="Sepia"><i class="fas fa-scroll"></i></button>
@@ -637,10 +719,10 @@
     ═══════════════════════════════════════ */
     let currentFontSize = 18;
     let currentTheme = 'light';
-    let currentReaderMode = 'text'; // 'text' | 'pdf'
+    let currentReaderMode = 'text';
 
     const ZOOM_LEVELS = [50, 75, 100, 125, 150, 175, 200, 250, 300];
-    let zoomLevel = 100; // percentage
+    let zoomLevel = 100;
     const ZOOM_STEP = 25;
 
     function escapeHtml(s) { if (!s) return ''; const d = document.createElement('div'); d.appendChild(document.createTextNode(s)); return d.innerHTML; }
@@ -676,16 +758,13 @@
         const inBtn = document.getElementById('zoomOutBtn');
         const outBtn = document.getElementById('zoomInBtn');
 
-        // Update displayed percentage (strip trailing zeros)
         const display = zoomLevel % 100 === 0 ? zoomLevel + '%' : zoomLevel.toFixed(0) + '%';
         val.childNodes[0].textContent = display + '\n        ';
         footer.textContent = display;
 
-        // Disable buttons at limits
         outBtn.classList.toggle('disabled', zoomLevel <= 50);
         inBtn.classList.toggle('disabled', zoomLevel >= 300);
 
-        // Highlight active dropdown option
         document.querySelectorAll('.r-zoom-option').forEach(opt => {
             opt.classList.toggle('active', parseInt(opt.dataset.zoom) === zoomLevel);
         });
@@ -695,20 +774,15 @@
         const scale = zoomLevel / 100;
 
         if (currentReaderMode === 'pdf') {
-            // Scale all PDF canvases
             document.querySelectorAll('.pdf-page-canvas').forEach(canvas => {
                 canvas.style.transform = `scale(${scale})`;
-                // Adjust margin to prevent overlap — the canvas visual size changes with scale
-                const h = canvas.height * scale;
                 canvas.style.marginBottom = Math.max(8, 24 * scale) + 'px';
             });
-            // Adjust container width so scaled canvases don't clip
             const inner = document.querySelector('.r-page-inner');
             if (inner) {
                 inner.style.maxWidth = (700 * scale) + 'px';
             }
         } else {
-            // Text mode: scale font size proportionally
             const baseSize = 18;
             const newSize = Math.max(10, Math.min(48, Math.round(baseSize * scale)));
             currentFontSize = newSize;
@@ -729,7 +803,6 @@
         ).join('');
     }
 
-    // Close dropdown on outside click
     document.addEventListener('click', e => {
         const dd = document.getElementById('zoomDropdown');
         const val = document.getElementById('zoomValue');
@@ -741,232 +814,3 @@
     /* ═══════════════════════════════════════
        OPEN READER
     ═══════════════════════════════════════ */
-    function openReaderFromCard(cardEl) {
-        if (!cardEl) return;
-        const fileUrl = cardEl.dataset.fileUrl;
-        const title = cardEl.querySelector('.r-book-title')?.textContent || 'Untitled';
-        const author = cardEl.dataset.author || 'Unknown';
-        const type = (cardEl.dataset.fileType || '').toLowerCase();
-
-        if (!fileUrl) { showError('File Not Found', 'No file URL available.'); return; }
-
-        // Reset zoom to 100%
-        zoomLevel = 100;
-        currentFontSize = 18;
-
-        document.getElementById('readerTitle').textContent = title;
-        document.getElementById('readerContent').innerHTML = '';
-
-        const overlay = document.getElementById('readerOverlay');
-        overlay.classList.add('open');
-        overlay.classList.remove('dark-mode', 'sepia-mode');
-        currentTheme = 'light';
-        document.querySelectorAll('#btnLight,#btnDark,#btnSepia').forEach(b => b.classList.remove('active'));
-        document.getElementById('btnLight').classList.add('active');
-
-        document.body.style.overflow = 'hidden';
-        document.getElementById('readerPage').scrollTop = 0;
-        document.getElementById('progressFill').style.width = '0%';
-        document.getElementById('pageIndicator').textContent = 'Scroll to read';
-
-        // Reset content width
-        const inner = document.querySelector('.r-page-inner');
-        if (inner) inner.style.maxWidth = '700px';
-
-        // Show/hide font select based on mode
-        const isImage = ['jpg','jpeg','png','gif','webp'].includes(type);
-        document.getElementById('fontSelect').style.display = (type === 'pdf' || isImage) ? 'none' : '';
-
-        buildZoomDropdown();
-        updateZoomUI();
-
-        switch (type) {
-            case 'pdf':
-                if (typeof pdfjsLib === 'undefined') { showError('Library Not Available', 'PDF.js could not be loaded.'); return; }
-                currentReaderMode = 'pdf'; loadPdf(fileUrl, title, author); break;
-            case 'doc': case 'docx':
-                if (typeof mammoth === 'undefined') { showError('Library Not Available', 'Document converter could not be loaded.'); return; }
-                currentReaderMode = 'text'; loadDocx(fileUrl, title, author); break;
-            case 'txt':
-                currentReaderMode = 'text'; loadTextFile(fileUrl, title, author); break;
-            case 'jpg': case 'jpeg': case 'png': case 'gif': case 'webp':
-                currentReaderMode = 'pdf'; loadImage(fileUrl, title, author); break;
-            default:
-                currentReaderMode = 'text'; showError('Unsupported Format', `.${type || '?'} files are not supported.`);
-        }
-    }
-
-    /* ═══════════════════════════════════════
-       PDF LOADER
-    ═══════════════════════════════════════ */
-    async function loadPdf(url, title, author) {
-        const content = document.getElementById('readerContent');
-        showLoading('Loading PDF...');
-        try {
-            const pdf = await pdfjsLib.getDocument(url).promise;
-            content.innerHTML = `
-                <h1 class="r-chapter-title">${escapeHtml(title)}</h1>
-                <div class="r-chapter-sub">By ${escapeHtml(author)} &middot; PDF &middot; ${pdf.numPages} page${pdf.numPages !== 1 ? 's' : ''}</div>
-                <div id="pdfPageContainer"></div>
-                <div class="pdf-render-progress" id="pdfProgress">
-                    <div class="pdf-render-bar"><div class="pdf-render-bar-fill" id="pdfBarFill"></div></div>
-                    <span id="pdfProgressText">Rendering page 1 of ${pdf.numPages}...</span>
-                </div>`;
-            const container = document.getElementById('pdfPageContainer');
-            const barFill = document.getElementById('pdfBarFill');
-            const progressText = document.getElementById('pdfProgressText');
-
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const vp0 = page.getViewport({ scale: 1 });
-                const scale = 680 / vp0.width;
-                const vp = page.getViewport({ scale });
-                const canvas = document.createElement('canvas');
-                canvas.width = Math.floor(vp.width);
-                canvas.height = Math.floor(vp.height);
-                canvas.className = 'pdf-page-canvas';
-                await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
-                container.appendChild(canvas);
-                barFill.style.width = Math.round(i / pdf.numPages * 100) + '%';
-                progressText.textContent = `Rendering page ${i} of ${pdf.numPages}...`;
-            }
-            document.getElementById('pdfProgress').remove();
-            applyZoom();
-        } catch (err) {
-            console.error(err);
-            if (err.name === 'PasswordException') showError('Password Protected', 'This PDF is password-protected.');
-            else if (err instanceof TypeError) showError('Network Error', 'Could not fetch the file. Check CORS settings if using S3.');
-            else showError('Failed to Load PDF', 'Could not load or render this PDF.');
-        }
-    }
-
-    /* ═══════════════════════════════════════
-       DOCX LOADER
-    ═══════════════════════════════════════ */
-    async function loadDocx(url, title, author) {
-        showLoading('Loading document...');
-        try {
-            const res = await fetch(url); if (!res.ok) throw new Error(res.status);
-            const result = await mammoth.convertToHtml({ arrayBuffer: await res.arrayBuffer() });
-            let html = result.value;
-            if (!html || html.trim().length < 10) { showError('Empty Document', 'This document contains no extractable text.'); return; }
-            html = html.replace(/(?:<br\s*\/?>\s*)+(?=<\/?)/gi, '</p><p>');
-            if (!html.startsWith('<p') && !html.startsWith('<h') && !html.startsWith('<div')) html = '<p>' + html + '</p>';
-            document.getElementById('readerContent').innerHTML = `
-                <h1 class="r-chapter-title">${escapeHtml(title)}</h1>
-                <div class="r-chapter-sub">By ${escapeHtml(author)} &middot; Word Document &middot; Scrollable</div>
-                <div class="r-reader-text" style="font-size:${currentFontSize}px;">${html}</div>`;
-            applyZoom();
-        } catch (err) {
-            console.error(err);
-            if (err instanceof TypeError) showError('Network Error', 'Could not fetch the file. Check CORS settings.');
-            else showError('Failed to Load', 'Could not convert this document.');
-        }
-    }
-
-    /* ═══════════════════════════════════════
-       TEXT LOADER
-    ═══════════════════════════════════════ */
-    async function loadTextFile(url, title, author) {
-        showLoading('Loading text...');
-        try {
-            const res = await fetch(url); if (!res.ok) throw new Error(res.status);
-            const text = await res.text();
-            if (!text || text.trim().length < 5) { showError('Empty File', 'This file is empty.'); return; }
-            const html = text.split(/\n\s*\n/).map(b => b.trim()).filter(b => b).map(b => '<p>' + b.split(/\n/).map(l => l.trim()).join(' ') + '</p>').join('');
-            document.getElementById('readerContent').innerHTML = `
-                <h1 class="r-chapter-title">${escapeHtml(title)}</h1>
-                <div class="r-chapter-sub">By ${escapeHtml(author)} &middot; Text File &middot; Scrollable</div>
-                <div class="r-reader-text" style="font-size:${currentFontSize}px;">${html}</div>`;
-            applyZoom();
-        } catch (err) { showError('Failed to Load', 'Could not load this text file.'); }
-    }
-
-    /* ═══════════════════════════════════════
-       IMAGE LOADER
-    ═══════════════════════════════════════ */
-    function loadImage(url, title, author) {
-        document.getElementById('readerContent').innerHTML = `
-            <h1 class="r-chapter-title">${escapeHtml(title)}</h1>
-            <div class="r-chapter-sub">By ${escapeHtml(author)} &middot; Image</div>
-            <div style="text-align:center;padding:1rem 0;">
-                <img src="${escapeHtml(url)}" alt="${escapeHtml(title)}" style="max-width:100%;border-radius:4px;box-shadow:0 2px 20px rgba(0,0,0,0.08);transition:transform 0.25s;transform-origin:top center;" onerror="this.outerHTML='<p style=\\'color:var(--gok-gray-400);padding:3rem 0;\\'>Image could not be loaded.</p>'" />
-            </div>`;
-        applyZoom();
-    }
-
-    /* ═══════════════════════════════════════
-       READER CONTROLS
-    ═══════════════════════════════════════ */
-    function closeReader() {
-        document.getElementById('readerOverlay').classList.remove('open');
-        document.body.style.overflow = '';
-    }
-
-    function changeFont(f) {
-        const el = document.querySelector('.r-reader-text');
-        if (el) el.style.fontFamily = f;
-    }
-
-    function setTheme(theme) {
-        currentTheme = theme;
-        const overlay = document.getElementById('readerOverlay');
-        overlay.classList.remove('dark-mode', 'sepia-mode');
-        if (theme !== 'light') overlay.classList.add(theme + '-mode');
-        document.querySelectorAll('#btnLight,#btnDark,#btnSepia').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn' + theme.charAt(0).toUpperCase() + theme.slice(1)).classList.add('active');
-    }
-
-    function toggleFullscreen() {
-        if (!document.fullscreenElement) document.getElementById('readerOverlay').requestFullscreen().catch(() => {});
-        else document.exitFullscreen();
-    }
-
-    function jumpToProgress(e) {
-        const bar = document.getElementById('progressBar');
-        const scroll = document.getElementById('readerPage');
-        const pct = (e.clientX - bar.getBoundingClientRect().left) / bar.offsetWidth;
-        scroll.scrollTop = pct * (scroll.scrollHeight - scroll.clientHeight);
-    }
-
-    /* ═══════════════════════════════════════
-       SCROLL PROGRESS
-    ═══════════════════════════════════════ */
-    document.getElementById('readerPage')?.addEventListener('scroll', function() {
-        const s = this, max = s.scrollHeight - s.clientHeight;
-        if (max <= 0) return;
-        const pct = Math.min(100, Math.max(0, (s.scrollTop / max) * 100));
-        document.getElementById('progressFill').style.width = pct + '%';
-        document.getElementById('pageIndicator').textContent = Math.round(pct) + '% read';
-    });
-
-    /* ═══════════════════════════════════════
-       KEYBOARD SHORTCUTS
-    ═══════════════════════════════════════ */
-    document.addEventListener('keydown', e => {
-        if (!document.getElementById('readerOverlay').classList.contains('open')) return;
-        if (e.key === 'Escape') closeReader();
-        // Ctrl + / Ctrl - for zoom
-        if ((e.ctrlKey || e.metaKey) && (e.key === '=' || e.key === '+')) { e.preventDefault(); zoomIn(); }
-        if ((e.ctrlKey || e.metaKey) && e.key === '-') { e.preventDefault(); zoomOut(); }
-        if ((e.ctrlKey || e.metaKey) && e.key === '0') { e.preventDefault(); setZoom(100); }
-        // Arrow keys to scroll
-        if (e.key === 'ArrowUp' && !e.ctrlKey) { e.preventDefault(); document.getElementById('readerPage').scrollBy({ top: -60, behavior: 'smooth' }); }
-        if (e.key === 'ArrowDown' && !e.ctrlKey) { e.preventDefault(); document.getElementById('readerPage').scrollBy({ top: 60, behavior: 'smooth' }); }
-    });
-
-    // Mouse wheel zoom for PDFs (ctrl+scroll)
-    document.getElementById('readerPage')?.addEventListener('wheel', function(e) {
-        if (!e.ctrlKey && !e.metaKey) return;
-        if (currentReaderMode !== 'pdf') return;
-        e.preventDefault();
-        if (e.deltaY < 0) zoomIn(); else zoomOut();
-    }, { passive: false });
-
-    const spinStyle = document.createElement('style');
-    spinStyle.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
-    document.head.appendChild(spinStyle);
-</script>
-
-</body>
-</html>
