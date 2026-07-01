@@ -13,14 +13,38 @@ class PublicController extends Controller
     |------------------------------------------------------------------
     | READER PORTAL — Main landing page (/)
     |------------------------------------------------------------------
-    | Shows ALL books. Frontend handles search and pagination.
+    | Shows all books in the reading-shelf layout.
     | No auth required. No download buttons.
     */
     public function readerPortal(Request $request)
     {
         $documents = Document::with('category')
-            ->orderByDesc('created_at')
-            ->get();
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'LIKE', "%{$search}%")
+                      ->orWhere('author_creator', 'LIKE', "%{$search}%")
+                      ->orWhere('description', 'LIKE', "%{$search}%");
+                });
+            })
+            ->when($request->category, function ($query, $categoryId) {
+                $query->where('category_id', $categoryId);
+            })
+            ->when($request->type, function ($query, $type) {
+                $query->where('document_type', $type);
+            })
+            ->when($request->sort === 'oldest', function ($query) {
+                $query->orderBy('created_at', 'asc');
+            })
+            ->when($request->sort === 'title', function ($query) {
+                $query->orderBy('title', 'asc');
+            })
+            ->when($request->sort === 'popular', function ($query) {
+                $query->orderByDesc('views');
+            })
+            ->when(!$request->sort || $request->sort === 'newest', function ($query) {
+                $query->orderByDesc('created_at');
+            })
+            ->paginate(24);
 
         $categories = Category::orderBy('name')->get();
 
@@ -31,7 +55,7 @@ class PublicController extends Controller
     |------------------------------------------------------------------
     | REPORTS — Publications & Reports browsing (/reports)
     |------------------------------------------------------------------
-    | Server-side paginated. Separate page, different UX.
+    | Shows only publication/report type documents.
     | No auth required.
     */
     public function reports(Request $request)
@@ -76,6 +100,7 @@ class PublicController extends Controller
     */
     public function readInline(Document $document)
     {
+        // Increment view count
         $document->increment('views');
 
         $content = null;
@@ -84,19 +109,22 @@ class PublicController extends Controller
 
         if (!file_exists($filePath)) {
             return response()->json([
-                'content'     => null,
+                'content'    => null,
                 'description' => $description,
-                'pages'       => null,
-                'error'       => 'File not found on disk.',
+                'pages'      => null,
+                'error'      => 'File not found on disk.',
             ], 404);
         }
 
         $ext = strtolower($document->file_type);
 
+        // Plain text files — read directly
         if ($ext === 'txt') {
             $raw = file_get_contents($filePath);
             $content = $this->formatPlainText($raw);
         }
+
+        // PDF files — extract text via Smalot\PdfParser
         elseif ($ext === 'pdf' && class_exists('\Smalot\PdfParser\Parser')) {
             try {
                 $parser = new \Smalot\PdfParser\Parser();
@@ -107,9 +135,12 @@ class PublicController extends Controller
                     $content = $this->formatPlainText($text);
                 }
             } catch (\Exception $e) {
+                // Silently fail — reader will show fallback message
                 $content = null;
             }
         }
+
+        // DOCX files — extract text via PhpOffice\PhpWord
         elseif (in_array($ext, ['doc', 'docx']) && class_exists('\PhpOffice\PhpWord\IOFactory')) {
             try {
                 $phpWord = \PhpOffice\PhpWord\IOFactory::load($filePath);
@@ -135,9 +166,9 @@ class PublicController extends Controller
         }
 
         return response()->json([
-            'content'     => $content,
+            'content'    => $content,
             'description' => $description,
-            'pages'       => $content ? 'Scrollable' : null,
+            'pages'      => $content ? 'Scrollable' : null,
         ]);
     }
 
@@ -148,7 +179,10 @@ class PublicController extends Controller
     */
     private function formatPlainText(string $text): string
     {
+        // Normalize line endings
         $text = str_replace(["\r\n", "\r"], "\n", $text);
+
+        // Split into paragraphs (double newline = paragraph break)
         $blocks = preg_split('/\n\s*\n/', trim($text));
 
         $html = '';
@@ -158,6 +192,7 @@ class PublicController extends Controller
                 continue;
             }
 
+            // Detect if block looks like a heading (short, possibly all caps, no period at end)
             $isHeading = (
                 strlen($block) < 80 &&
                 preg_match('/^[A-Z]/', $block) &&
@@ -168,6 +203,7 @@ class PublicController extends Controller
             if ($isHeading) {
                 $html .= '<h2>' . e($block) . "</h2>\n";
             } else {
+                // Convert single newlines within a block to spaces (re-flow text)
                 $flowed = preg_replace('/\n/', ' ', $block);
                 $html .= '<p>' . e($flowed) . "</p>\n";
             }
