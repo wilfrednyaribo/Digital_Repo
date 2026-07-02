@@ -42,7 +42,7 @@ class PublicController extends Controller
             ->when(!$request->sort || $request->sort === 'newest', function ($query) {
                 $query->orderByDesc('created_at');
             })
-            ->paginate(100);
+            ->paginate(50);
 
         $categories = Category::orderBy('name')->get();
 
@@ -76,7 +76,7 @@ class PublicController extends Controller
                       ->orWhere('description', 'LIKE', "%{$q}%");
             })
             ->orderByDesc('created_at')
-            ->limit(200)
+            ->limit(500)
             ->get();
 
         // Render just the card HTML using the shared partial
@@ -119,7 +119,7 @@ class PublicController extends Controller
             ->when(!$request->sort || $request->sort === 'newest', function ($query) {
                 $query->orderByDesc('created_at');
             })
-            ->paginate(100);
+            ->paginate(50);
 
         $categories = Category::orderBy('name')->get();
 
