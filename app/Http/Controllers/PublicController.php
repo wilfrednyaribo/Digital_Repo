@@ -76,7 +76,7 @@ class PublicController extends Controller
                       ->orWhere('description', 'LIKE', "%{$q}%");
             })
             ->orderByDesc('created_at')
-            ->limit(500)
+            ->limit(200)
             ->get();
 
         // Render just the card HTML using the shared partial
